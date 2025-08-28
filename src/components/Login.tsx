@@ -187,51 +187,51 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl font-bold text-white">U</span>
+        <div className="text-center mb-6 md:mb-8">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
+            <span className="text-xl sm:text-2xl font-bold text-white">U</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">ULIMI 2.0</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">ULIMI 2.0</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">
             {isRegister ? 'Create your account' : 'Sign in to your account'}
           </p>
         </div>
 
         {/* Demo Credentials */}
         {!isRegister && (
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800 mb-3 font-medium">Demo Accounts:</p>
+          <div className="mb-4 md:mb-6 p-3 md:p-4 bg-blue-50 rounded-lg">
+            <p className="text-sm text-blue-800 mb-2 md:mb-3 font-medium">Demo Accounts:</p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => fillDemoCredentials('admin')}
-                className="text-left text-xs text-blue-700 hover:text-blue-900 bg-white p-2 rounded border border-blue-200 hover:border-blue-300"
+                className="text-left text-xs text-blue-700 hover:text-blue-900 bg-white p-2 md:p-2.5 rounded border border-blue-200 hover:border-blue-300 touch-manipulation min-h-[60px] transition-colors active:scale-95"
               >
                 👑 <strong>Admin</strong><br/>
-                admin@ulimi.com
+                <span className="text-xs">admin@ulimi.com</span>
               </button>
               <button
                 onClick={() => fillDemoCredentials('farmer')}
-                className="text-left text-xs text-blue-700 hover:text-blue-900 bg-white p-2 rounded border border-blue-200 hover:border-blue-300"
+                className="text-left text-xs text-blue-700 hover:text-blue-900 bg-white p-2 md:p-2.5 rounded border border-blue-200 hover:border-blue-300 touch-manipulation min-h-[60px] transition-colors active:scale-95"
               >
                 👨‍🌾 <strong>Farmer</strong><br/>
-                mirriam@ulimi.com
+                <span className="text-xs">mirriam@ulimi.com</span>
               </button>
               <button
                 onClick={() => fillDemoCredentials('customer')}
-                className="text-left text-xs text-blue-700 hover:text-blue-900 bg-white p-2 rounded border border-blue-200 hover:border-blue-300"
+                className="text-left text-xs text-blue-700 hover:text-blue-900 bg-white p-2 md:p-2.5 rounded border border-blue-200 hover:border-blue-300 touch-manipulation min-h-[60px] transition-colors active:scale-95"
               >
                 🛒 <strong>Customer</strong><br/>
-                natasha@ulimi.com
+                <span className="text-xs">natasha@ulimi.com</span>
               </button>
               <button
                 onClick={() => fillDemoCredentials('ussd')}
-                className="text-left text-xs text-blue-700 hover:text-blue-900 bg-white p-2 rounded border border-blue-200 hover:border-blue-300"
+                className="text-left text-xs text-blue-700 hover:text-blue-900 bg-white p-2 md:p-2.5 rounded border border-blue-200 hover:border-blue-300 touch-manipulation min-h-[60px] transition-colors active:scale-95"
               >
                 📱 <strong>USSD</strong><br/>
-                +260977555123
+                <span className="text-xs">+260977555123</span>
               </button>
             </div>
             <p className="text-xs text-blue-600 mt-2">💡 Each role has different permissions and features</p>
@@ -240,15 +240,15 @@ const Login: React.FC = () => {
 
         {/* Login Method Selection */}
         {!isRegister && (
-          <div className="mb-6">
+          <div className="mb-4 md:mb-6">
             <div className="flex space-x-2 mb-4">
               <button
                 type="button"
                 onClick={() => setIsUSSDLogin(false)}
-                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-colors touch-manipulation min-h-[50px] ${
                   !isUSSDLogin 
                     ? 'bg-green-600 text-white' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
                 }`}
               >
                 💻 Web Login
@@ -256,10 +256,10 @@ const Login: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsUSSDLogin(true)}
-                className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-colors touch-manipulation min-h-[50px] ${
                   isUSSDLogin 
                     ? 'bg-green-600 text-white' 
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200 active:bg-gray-300'
                 }`}
               >
                 📱 USSD Login
@@ -281,10 +281,10 @@ const Login: React.FC = () => {
                         setLoginType(type);
                         setLoginForm(prev => ({ ...prev, loginType: type, identifier: '' }));
                       }}
-                      className={`p-2 rounded-lg border-2 text-sm font-medium transition-colors ${
+                      className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors touch-manipulation min-h-[60px] active:scale-95 ${
                         loginType === type
                           ? 'border-green-600 bg-green-50 text-green-800'
-                          : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                          : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 active:bg-gray-50'
                       }`}
                     >
                       {type === 'email' && '📧'}
@@ -299,7 +299,7 @@ const Login: React.FC = () => {
           </div>
         )}
         {isRegister && (
-          <div className="mb-6">
+          <div className="mb-4 md:mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               I want to register as:
             </label>
@@ -311,10 +311,10 @@ const Login: React.FC = () => {
                   onClick={() => {
                     setRegisterForm(prev => ({ ...prev, role }));
                   }}
-                  className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                  className={`p-3 md:p-4 rounded-lg border-2 text-sm font-medium transition-colors touch-manipulation min-h-[60px] active:scale-95 ${
                     registerForm.role === role
                       ? 'border-green-600 bg-green-50 text-green-800'
-                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 active:bg-gray-50'
                   }`}
                 >
                   {role === 'farmer' && '👨‍🌾'}
@@ -360,7 +360,7 @@ const Login: React.FC = () => {
             /* Web Login Form */
             <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   {loginType === 'email' && 'Email Address'}
                   {loginType === 'phone' && 'Phone Number'}
                   {loginType === 'username' && 'Username'}
@@ -369,7 +369,7 @@ const Login: React.FC = () => {
                   type={loginType === 'email' ? 'email' : 'text'}
                   value={loginForm.identifier}
                   onChange={(e) => setLoginForm(prev => ({ ...prev, identifier: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                   placeholder={
                     loginType === 'email' ? 'Enter your email' :
                     loginType === 'phone' ? '+260977123456' :
@@ -380,14 +380,14 @@ const Login: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
                 <input
                   type="password"
                   value={loginForm.password}
                   onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                   placeholder="Enter your password"
                   disabled={isAccountLocked}
                   required
@@ -396,7 +396,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={authState.loading || isAccountLocked}
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-green-600 text-white py-4 md:py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-base touch-manipulation active:scale-95"
               >
                 {authState.loading ? 'Signing in...' : 'Sign In'}
               </button>
@@ -404,7 +404,7 @@ const Login: React.FC = () => {
           ) : (
             /* USSD Login Form */
             <form onSubmit={handleUSSDSubmit} className="space-y-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 md:p-4 mb-4">
                 <div className="flex items-center">
                   <span className="text-yellow-600 text-lg mr-2">📱</span>
                   <div>
@@ -414,28 +414,28 @@ const Login: React.FC = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number
                 </label>
                 <input
                   type="tel"
                   value={ussdForm.phone}
                   onChange={(e) => setUssdForm(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                   placeholder="+260977123456"
                   disabled={isAccountLocked}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   4-Digit PIN
                 </label>
                 <input
                   type="password"
                   value={ussdForm.pin}
                   onChange={(e) => setUssdForm(prev => ({ ...prev, pin: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest"
+                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-center text-lg tracking-widest transition-colors"
                   placeholder="••••"
                   maxLength={4}
                   disabled={isAccountLocked}
@@ -445,7 +445,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={authState.loading || isAccountLocked}
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-green-600 text-white py-4 md:py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-base touch-manipulation active:scale-95"
               >
                 {authState.loading ? 'Connecting...' : 'USSD Login'}
               </button>
@@ -587,7 +587,7 @@ const Login: React.FC = () => {
               setError('');
               setSuccess('');
             }}
-            className="text-green-600 hover:text-green-800 text-sm font-medium"
+            className="text-green-600 hover:text-green-800 text-sm font-medium py-2 px-4 rounded-lg touch-manipulation transition-colors"
           >
             {isRegister ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
           </button>

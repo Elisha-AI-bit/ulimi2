@@ -379,18 +379,18 @@ export default function Marketplace() {
   const analytics = calculateAnalytics();
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="sm:flex sm:items-center">
-        <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Marketplace</h1>
-          <p className="mt-2 text-sm text-gray-700">
+    <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-safe">
+      <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0">
+        <div className="flex-auto min-w-0">
+          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">Marketplace</h1>
+          <p className="mt-1 text-sm text-gray-700">
             Buy agricultural inputs and sell your produce
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+        <div className="mt-2 sm:mt-0 sm:ml-4 sm:flex-none">
           <button
             onClick={() => setShowAddForm(true)}
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:w-auto"
+            className="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-transparent bg-green-600 px-4 py-3 sm:py-2 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors touch-manipulation"
           >
             <Plus className="h-4 w-4 mr-2" />
             List Item
@@ -399,70 +399,70 @@ export default function Marketplace() {
       </div>
 
       {/* Tabs */}
-      <div className="mt-6 border-b border-gray-200">
-        <nav className="-mb-px flex space-x-4 overflow-x-auto sm:space-x-8">
+      <div className="mt-4 md:mt-6 border-b border-gray-200">
+        <nav className="-mb-px flex space-x-1 sm:space-x-4 lg:space-x-8 overflow-x-auto scrollbar-hide">
           <button
             onClick={() => setActiveTab('buy')}
-            className={`py-2 px-3 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 ${
+            className={`py-3 px-3 sm:px-4 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 touch-manipulation transition-colors min-h-[48px] ${
               activeTab === 'buy'
                 ? 'border-green-500 text-green-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
+            <ShoppingCart className="h-4 w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Buy Inputs</span>
             <span className="sm:hidden">Buy</span>
           </button>
           <button
             onClick={() => setActiveTab('sell')}
-            className={`py-2 px-3 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 ${
+            className={`py-3 px-3 sm:px-4 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 touch-manipulation transition-colors min-h-[48px] ${
               activeTab === 'sell'
                 ? 'border-green-500 text-green-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <Package className="h-4 w-4 mr-2" />
+            <Package className="h-4 w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Sell Produce</span>
             <span className="sm:hidden">Sell</span>
           </button>
           <button
             onClick={() => setActiveTab('orders')}
-            className={`py-2 px-3 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 ${
+            className={`py-3 px-3 sm:px-4 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 touch-manipulation transition-colors min-h-[48px] ${
               activeTab === 'orders'
                 ? 'border-green-500 text-green-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <Clock className="h-4 w-4 mr-2" />
+            <Clock className="h-4 w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">My Orders</span>
             <span className="sm:hidden">Orders</span>
             {analytics.pendingOrders > 0 && (
-              <span className="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+              <span className="ml-1 sm:ml-2 inline-flex px-1.5 py-0.5 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
                 {analytics.pendingOrders}
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('suppliers')}
-            className={`py-2 px-3 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 ${
+            className={`py-3 px-3 sm:px-4 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 touch-manipulation transition-colors min-h-[48px] ${
               activeTab === 'suppliers'
                 ? 'border-green-500 text-green-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <Users className="h-4 w-4 mr-2" />
+            <Users className="h-4 w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Suppliers</span>
             <span className="sm:hidden">Suppliers</span>
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`py-2 px-3 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 ${
+            className={`py-3 px-3 sm:px-4 border-b-2 font-medium text-sm whitespace-nowrap flex items-center flex-shrink-0 touch-manipulation transition-colors min-h-[48px] ${
               activeTab === 'analytics'
                 ? 'border-green-500 text-green-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            <BarChart3 className="h-4 w-4 mr-2" />
+            <BarChart3 className="h-4 w-4 mr-1 sm:mr-2" />
             <span className="hidden sm:inline">Analytics</span>
             <span className="sm:hidden">Analytics</span>
           </button>
@@ -471,23 +471,25 @@ export default function Marketplace() {
 
       {/* Enhanced Filters */}
       {(activeTab === 'buy' || activeTab === 'sell') && (
-        <div className="mt-6 space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-            <div className="relative sm:col-span-2 lg:col-span-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search items..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
-              />
-            </div>
-
+        <div className="mt-4 md:mt-6 space-y-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search items..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 block w-full h-12 md:h-10 border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-base md:text-sm transition-colors"
+            />
+          </div>
+          
+          {/* Filter Grid */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              className="block w-full h-12 md:h-10 border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-base md:text-sm transition-colors"
             >
               <option value="all">All Categories</option>
               <option value="inputs">Inputs</option>
@@ -497,7 +499,7 @@ export default function Marketplace() {
             <select
               value={selectedProvince}
               onChange={(e) => setSelectedProvince(e.target.value)}
-              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              className="block w-full h-12 md:h-10 border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-base md:text-sm transition-colors"
             >
               <option value="all">All Provinces</option>
               {zambiaProvinces.map(province => (
@@ -510,7 +512,7 @@ export default function Marketplace() {
               placeholder="Min price"
               value={priceRange.min}
               onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              className="block w-full h-12 md:h-10 border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-base md:text-sm transition-colors"
             />
 
             <input
@@ -518,13 +520,13 @@ export default function Marketplace() {
               placeholder="Max price"
               value={priceRange.max}
               onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              className="block w-full h-12 md:h-10 border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-base md:text-sm transition-colors"
             />
 
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+              className="block w-full h-12 md:h-10 border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 text-base md:text-sm transition-colors"
             >
               <option value="name">Sort by Name</option>
               <option value="price_low">Price: Low to High</option>
@@ -534,7 +536,7 @@ export default function Marketplace() {
             </select>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+          <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
             <div className="flex items-center">
               <Filter className="h-4 w-4 text-gray-400 mr-2" />
               <span className="text-sm text-gray-600">{filteredItems.length} items found</span>

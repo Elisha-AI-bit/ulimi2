@@ -256,41 +256,44 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
+    <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-safe">
       {/* Header with Offline Status */}
-      <div className="mb-8 flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('welcome')}</h1>
-          <p className="mt-2 text-gray-600">Your comprehensive smart farming management system</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <OfflineStatusIndicator />
-          <button
-            onClick={loadDashboardData}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </button>
+      <div className="mb-4 md:mb-6 lg:mb-8">
+        <div className="flex flex-col space-y-3 md:flex-row md:justify-between md:items-start md:space-y-0">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 truncate">{t('welcome')}</h1>
+            <p className="mt-1 text-sm md:text-base text-gray-600 line-clamp-2">Your comprehensive smart farming management system</p>
+          </div>
+          <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0">
+            <OfflineStatusIndicator />
+            <button
+              onClick={loadDashboardData}
+              className="inline-flex items-center px-3 py-2.5 md:px-4 md:py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 touch-manipulation min-h-[44px] md:min-h-[auto] transition-colors"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Refresh</span>
+              <span className="sm:hidden">Sync</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Enhanced Stats Grid */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 mb-8">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 mb-4 md:mb-6 lg:mb-8">
         {stats.map((stat) => (
-          <div key={stat.name} className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
-            <div className="p-4 sm:p-5">
+          <div key={stat.name} className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow touch-manipulation">
+            <div className="p-3 sm:p-4 md:p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className={`p-2 sm:p-3 rounded-md ${stat.color}`}>
-                    <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
+                  <div className={`p-2 sm:p-2.5 md:p-3 rounded-md ${stat.color}`}>
+                    <stat.icon className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                   </div>
                 </div>
-                <div className="ml-3 sm:ml-5 w-0 flex-1">
+                <div className="ml-2 sm:ml-3 md:ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">{stat.name}</dt>
-                    <dd className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</dd>
-                    <dd className="text-xs text-gray-500 mt-1 hidden sm:block">{stat.change}</dd>
+                    <dt className="text-xs sm:text-sm font-medium text-gray-500 truncate leading-tight">{stat.name}</dt>
+                    <dd className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 leading-tight">{stat.value}</dd>
+                    <dd className="text-xs text-gray-500 mt-0.5 truncate leading-tight">{stat.change}</dd>
                   </dl>
                 </div>
               </div>
@@ -299,25 +302,25 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
         {/* Quick Actions */}
         <div className="lg:col-span-2 order-2 lg:order-1">
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center">
-              <h3 className="text-lg font-medium text-gray-900 mb-2 sm:mb-0">Quick Actions</h3>
+              <h3 className="text-base md:text-lg font-medium text-gray-900 mb-2 sm:mb-0">Quick Actions</h3>
               <span className="text-sm text-gray-500">Access key features</span>
             </div>
-            <div className="p-4 sm:p-6">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="p-3 sm:p-4 md:p-6">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {quickActions.map((action) => (
                   <button
                     key={action.name}
                     onClick={() => onPageChange?.(action.action)}
-                    className={`${action.color} text-white p-4 sm:p-6 rounded-lg text-left transition-all hover:scale-105 hover:shadow-lg`}
+                    className={`${action.color} text-white p-4 sm:p-5 md:p-6 rounded-lg text-left transition-all hover:scale-105 hover:shadow-lg touch-manipulation active:scale-95`}
                   >
-                    <action.icon className="h-6 w-6 sm:h-8 sm:w-8 mb-2 sm:mb-3" />
-                    <h4 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2">{action.name}</h4>
-                    <p className="text-xs sm:text-sm opacity-90 line-clamp-2">{action.description}</p>
+                    <action.icon className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 mb-2 sm:mb-3" />
+                    <h4 className="text-sm sm:text-base md:text-lg font-semibold mb-1 sm:mb-2 leading-tight">{action.name}</h4>
+                    <p className="text-xs sm:text-sm opacity-90 line-clamp-2 leading-tight">{action.description}</p>
                     <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 mt-2 sm:mt-3 opacity-70" />
                   </button>
                 ))}
@@ -326,24 +329,24 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
           </div>
 
           {/* AI Recommendations */}
-          <div className="mt-8 bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <div className="mt-4 md:mt-6 lg:mt-8 bg-white shadow rounded-lg">
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <div className="flex items-center">
-                <Brain className="h-5 w-5 text-purple-600 mr-2" />
-                <h3 className="text-lg font-medium text-gray-900">AI Recommendations</h3>
+                <Brain className="h-4 w-4 md:h-5 md:w-5 text-purple-600 mr-2" />
+                <h3 className="text-base md:text-lg font-medium text-gray-900">AI Recommendations</h3>
               </div>
               <span className="text-sm text-gray-500">{recommendations.length} active</span>
             </div>
-            <div className="p-6">
+            <div className="p-3 sm:p-4 md:p-6">
               {recommendations.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {recommendations.slice(0, 4).map((rec) => (
-                    <div key={rec.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                    <div key={rec.id} className="border border-gray-200 rounded-lg p-3 md:p-4 hover:bg-gray-50 transition-colors touch-manipulation">
                       <div className="flex items-start justify-between">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center mb-2">
-                            <h4 className="text-sm font-medium text-gray-900">{rec.title}</h4>
-                            <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
+                            <h4 className="text-sm font-medium text-gray-900 truncate">{rec.title}</h4>
+                            <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${
                               rec.priority === 'high' ? 'bg-red-100 text-red-800' :
                               rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                               'bg-green-100 text-green-800'
@@ -351,25 +354,25 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
                               {rec.priority}
                             </span>
                           </div>
-                          <p className="mt-1 text-sm text-gray-600">{rec.description}</p>
-                          <div className="mt-2 flex items-center space-x-4">
+                          <p className="mt-1 text-sm text-gray-600 line-clamp-2">{rec.description}</p>
+                          <div className="mt-2 flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0">
                             <span className="text-xs text-gray-500 flex items-center">
-                              <Target className="h-3 w-3 mr-1" />
-                              Confidence: {rec.confidence}%
+                              <Target className="h-3 w-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">Confidence: {rec.confidence}%</span>
                             </span>
                             <span className="text-xs text-gray-500 flex items-center">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {formatDate(rec.createdAt)}
+                              <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+                              <span className="truncate">{formatDate(rec.createdAt)}</span>
                             </span>
                           </div>
                         </div>
-                        <div className="ml-4 flex items-center">
+                        <div className="ml-3 flex items-center flex-shrink-0">
                           {rec.type === 'crop_optimization' && <Target className="h-5 w-5 text-blue-500" />}
                           {rec.type === 'input_recommendation' && <Lightbulb className="h-5 w-5 text-green-500" />}
                           {rec.type === 'vision_diagnosis' && <Eye className="h-5 w-5 text-purple-500" />}
                         </div>
                       </div>
-                      <button className="mt-3 inline-flex items-center text-sm text-green-600 hover:text-green-500">
+                      <button className="mt-3 inline-flex items-center text-sm text-green-600 hover:text-green-500 touch-manipulation min-h-[44px] -ml-2 pl-2 pr-4 py-2 rounded-lg transition-colors">
                         View Details
                         <ArrowRight className="h-3 w-3 ml-1" />
                       </button>
@@ -377,8 +380,8 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Brain className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <div className="text-center py-6 md:py-8">
+                  <Brain className="h-10 w-10 md:h-12 md:w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">No AI recommendations available yet</p>
                   <p className="text-sm text-gray-400 mt-1">Start using AI features to get personalized insights</p>
                 </div>
@@ -388,13 +391,13 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
         </div>
 
         {/* Right Sidebar */}
-        <div className="lg:col-span-1 space-y-6 lg:space-y-8 order-1 lg:order-2">
+        <div className="lg:col-span-1 space-y-4 md:space-y-6 lg:space-y-8 order-1 lg:order-2">
           {/* Weather Widget */}
           {weather && weather.current && (
             <div className="bg-white shadow rounded-lg">
               <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                  <Thermometer className="h-5 w-5 text-orange-500 mr-2" />
+                <h3 className="text-base md:text-lg font-medium text-gray-900 flex items-center">
+                  <Thermometer className="h-4 w-4 md:h-5 md:w-5 text-orange-500 mr-2" />
                   {t('weather')}
                 </h3>
               </div>
@@ -436,8 +439,8 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
           {/* System Status */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                <BarChart3 className="h-5 w-5 text-green-500 mr-2" />
+              <h3 className="text-base md:text-lg font-medium text-gray-900 flex items-center">
+                <BarChart3 className="h-4 w-4 md:h-5 md:w-5 text-green-500 mr-2" />
                 System Status
               </h3>
             </div>
@@ -450,7 +453,7 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
                     }`}></div>
                     <span className="text-sm text-gray-700 truncate">Connection</span>
                   </div>
-                  <span className={`text-sm font-medium ml-2 ${
+                  <span className={`text-sm font-medium ml-2 flex-shrink-0 ${
                     isOfflineMode() ? 'text-red-600' : 'text-green-600'
                   }`}>
                     {isOfflineMode() ? 'Offline' : 'Online'}
@@ -462,7 +465,7 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
                     <Satellite className="w-3 h-3 text-purple-500 mr-3 flex-shrink-0" />
                     <span className="text-sm text-gray-700 truncate">Data Sync</span>
                   </div>
-                  <span className="text-sm text-gray-600 ml-2">
+                  <span className="text-sm text-gray-600 ml-2 flex-shrink-0">
                     {syncStatus?.status || 'Unknown'}
                   </span>
                 </div>
@@ -472,7 +475,7 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
                     <Cpu className="w-3 h-3 text-blue-500 mr-3 flex-shrink-0" />
                     <span className="text-sm text-gray-700 truncate">AI Models</span>
                   </div>
-                  <span className="text-sm text-green-600 ml-2">
+                  <span className="text-sm text-green-600 ml-2 flex-shrink-0">
                     {aiModels.length} Active
                   </span>
                 </div>
@@ -482,7 +485,7 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
                     <Wifi className="w-3 h-3 text-cyan-500 mr-3 flex-shrink-0" />
                     <span className="text-sm text-gray-700 truncate">IoT Sensors</span>
                   </div>
-                  <span className="text-sm text-gray-600 ml-2">
+                  <span className="text-sm text-gray-600 ml-2 flex-shrink-0">
                     {iotData.filter(s => s.status === 'active').length}/{iotData.length}
                   </span>
                 </div>
@@ -503,17 +506,17 @@ export default function Dashboard({ onPageChange }: { onPageChange?: (page: stri
 
           {/* Recent Activity */}
           <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                <Clock className="h-5 w-5 text-gray-500 mr-2" />
+            <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+              <h3 className="text-base md:text-lg font-medium text-gray-900 flex items-center">
+                <Clock className="h-4 w-4 md:h-5 md:w-5 text-gray-500 mr-2" />
                 Recent Activity
               </h3>
             </div>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <div className="space-y-3">
                 {tasks.slice(0, 5).map((task) => (
-                  <div key={task.id} className="flex items-center space-x-3">
-                    <div className={`w-2 h-2 rounded-full ${
+                  <div key={task.id} className="flex items-center space-x-3 py-1">
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                       task.status === 'completed' ? 'bg-green-500' :
                       task.status === 'in_progress' ? 'bg-blue-500' :
                       task.priority === 'high' ? 'bg-red-500' : 'bg-gray-400'
