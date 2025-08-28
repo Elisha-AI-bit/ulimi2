@@ -1,0 +1,288 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Menu, X, Home, Sprout, ShoppingCart, Brain, Cloud, CheckSquare, Package, User, Globe, LogOut, Zap, Cpu, Droplets } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useLanguage, LanguageSwitcher } from '../contexts/LanguageContext';
+import { storage } from '../utils/storage';
+import { PermissionNavItem } from '../utils/rbac-components';
+import OfflineStatusIndicator from './OfflineStatusIndicator';
+
+interface LayoutProps {
+  children: React.ReactNode;
+  currentPage: string;
+  onPageChange: (page: string) => void;
+}
+
+export default function Layout({ children, currentPage, onPageChange }: LayoutProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const roleSwitcherRef = useRef<HTMLDivElement>(null);
+  
+  const { authState, logout, switchRole } = useAuth();
+  const { t, currentLanguage } = useLanguage();
+  const user = authState.user;
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+      if (roleSwitcherRef.current && !roleSwitcherRef.current.contains(event.target as Node)) {
+        setShowRoleSwitcher(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const navigation = [
+    { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
+    { name: t('farms'), icon: Sprout, page: 'farms', permission: 'manage_farm_profile' },
+    { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
+    { name: t('ai_advisor'), icon: Brain, page: 'ai-advisor', permission: 'receive_soil_advice' },
+    { name: 'AI Decision Support', icon: Zap, page: 'ai-decision-support', permission: 'receive_soil_advice' },
+    { name: 'AI Capabilities', icon: Cpu, page: 'ai-capabilities', permission: 'receive_soil_advice' },
+    { name: t('weather'), icon: Cloud, page: 'weather', permission: 'view_weather' },
+    { name: t('tasks'), icon: CheckSquare, page: 'tasks', permission: 'manage_farm_profile' },
+    { name: t('inventory'), icon: Package, page: 'inventory', permission: 'add_products' },
+    { name: 'IoT Smart Irrigation', icon: Droplets, page: 'iot-irrigation', permission: 'manage_farm_profile' },
+    { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
+  ];
+
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+  };
+
+  const handleRoleSwitch = (newRole: 'admin' | 'farmer' | 'customer' | 'ussd_user') => {
+    const success = switchRole(newRole);
+    if (success) {
+      setShowRoleSwitcher(false);
+      // Redirect to appropriate page based on role
+      if (newRole === 'farmer') {
+        onPageChange('dashboard');
+      } else if (newRole === 'customer') {
+        onPageChange('marketplace');
+      } else if (newRole === 'admin') {
+        onPageChange('dashboard');
+      } else if (newRole === 'ussd_user') {
+        onPageChange('dashboard');
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile sidebar */}
+      <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
+          <div className="flex h-16 items-center justify-between px-4 border-b">
+            <div className="flex items-center">
+              <Sprout className="h-8 w-8 text-green-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">ULIMI 2.0</span>
+            </div>
+            <button onClick={() => setSidebarOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+          <nav className="flex-1 px-4 py-4 space-y-2">
+            {navigation.map((item) => (
+              <PermissionNavItem
+                key={item.page}
+                permission={item.permission as any}
+              >
+                <button
+                  onClick={() => {
+                    onPageChange(item.page);
+                    setSidebarOpen(false);
+                  }}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    currentPage === item.page
+                      ? 'bg-green-100 text-green-700'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  <item.icon className="mr-3 h-5 w-5" />
+                  {item.name}
+                </button>
+              </PermissionNavItem>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* Desktop sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
+          <div className="flex h-16 items-center px-4 border-b">
+            <Sprout className="h-8 w-8 text-green-600" />
+            <span className="ml-2 text-xl font-bold text-gray-900">ULIMI 2.0</span>
+          </div>
+          <nav className="flex-1 px-4 py-4 space-y-2">
+            {navigation.map((item) => (
+              <PermissionNavItem
+                key={item.page}
+                permission={item.permission as any}
+              >
+                <button
+                  onClick={() => onPageChange(item.page)}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                    currentPage === item.page
+                      ? 'bg-green-100 text-green-700'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  }`}
+                >
+                  <item.icon className="mr-3 h-5 w-5" />
+                  {item.name}
+                </button>
+              </PermissionNavItem>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Top bar */}
+        <div className="sticky top-0 z-40 flex h-16 bg-white border-b border-gray-200 shadow-sm">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500 lg:hidden"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+          
+          <div className="flex flex-1 justify-between px-4 lg:px-6">
+            <div className="flex items-center">
+              <h1 className="text-lg font-semibold text-gray-900 capitalize">
+                {navigation.find(item => item.page === currentPage)?.name || 'ULIMI 2.0'}
+              </h1>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              {/* Offline Status Indicator */}
+              <OfflineStatusIndicator compact={true} />
+              
+              {/* Role Switcher */}
+              <div className="relative" ref={roleSwitcherRef}>
+                <button
+                  onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
+                  className="flex items-center space-x-2 px-3 py-1 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors text-sm font-medium"
+                >
+                  <span>
+                    {user?.role === 'farmer' && '👨‍🌾'}
+                    {user?.role === 'customer' && '🛒'}
+                    {user?.role === 'admin' && '👑'}
+                  </span>
+                  <span className="capitalize">{user?.role}</span>
+                  <span className="text-xs">▼</span>
+                </button>
+                
+                {/* Role Switcher Dropdown */}
+                {showRoleSwitcher && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-xs text-gray-500 font-medium">Switch Role</p>
+                    </div>
+                    {(['admin', 'farmer', 'customer', 'ussd_user'] as const).map((role) => (
+                      <button
+                        key={role}
+                        onClick={() => handleRoleSwitch(role)}
+                        className={`flex items-center w-full px-4 py-2 text-sm transition-colors ${
+                          user?.role === role
+                            ? 'bg-green-50 text-green-800'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="mr-3">
+                          {role === 'farmer' && '👨‍🌾'}
+                          {role === 'customer' && '🛒'}
+                          {role === 'admin' && '👑'}
+                          {role === 'ussd_user' && '📱'}
+                        </span>
+                        <div className="text-left">
+                          <div className="capitalize font-medium">{role.replace('_', ' ')}</div>
+                          <div className="text-xs text-gray-500">
+                            {role === 'farmer' && 'Manage farms & crops'}
+                            {role === 'customer' && 'Browse & buy products'}
+                            {role === 'admin' && 'System administration'}
+                            {role === 'ussd_user' && 'Simplified mobile access'}
+                          </div>
+                        </div>
+                        {user?.role === role && (
+                          <span className="ml-auto text-green-600">✓</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Language selector */}
+              <LanguageSwitcher compact={true} showNativeNames={true} />
+              
+              {/* User menu */}
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center space-x-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-lg p-1"
+                >
+                  <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <User className="h-5 w-5 text-green-600" />
+                  </div>
+                  <span className="font-medium text-gray-700 hidden sm:block">
+                    {user?.name || 'User'}
+                  </span>
+                  <span className="text-xs text-gray-500 hidden sm:block capitalize">
+                    ({user?.role})
+                  </span>
+                </button>
+                
+                {/* Dropdown menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                      <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        onPageChange('profile');
+                        setShowUserMenu(false);
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <User className="mr-3 h-4 w-4" />
+                      Profile Settings
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-red-50"
+                    >
+                      <LogOut className="mr-3 h-4 w-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Page content */}
+        <main className="flex-1">
+          <div className="py-6">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

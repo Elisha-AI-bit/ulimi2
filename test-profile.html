@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: #059669; font-weight: bold; }
+        .issue { color: #dc2626; font-weight: bold; }
+        .info { color: #3b82f6; }
+        pre { background: #f9fafb; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>UserProfile Component Fix Verification</h1>
+        
+        <h2>Issue Identified</h2>
+        <div class="issue">
+            ❌ UserProfile component was showing blank screen
+        </div>
+        
+        <h3>Root Cause:</h3>
+        <ul>
+            <li>UserProfile component was managing its own separate user data using <code>storage.getUser()</code></li>
+            <li>The AuthContext was managing authentication separately</li>
+            <li>When no user was found in the component's storage, it returned <code>null</code> (blank screen)</li>
+            <li>There was no integration between authentication state and profile display</li>
+        </ul>
+
+        <h2>Solution Applied</h2>
+        <div class="success">
+            ✅ Fixed UserProfile component to use AuthContext
+        </div>
+        
+        <h3>Changes Made:</h3>
+        <ol>
+            <li><strong>Added AuthContext integration:</strong> Import and use <code>useAuth()</code> hook</li>
+            <li><strong>Removed duplicate user management:</strong> No longer creates separate default users</li>
+            <li><strong>Uses authenticated user data:</strong> Gets user info from <code>authState.user</code></li>
+            <li><strong>Better loading state:</strong> Shows loading spinner instead of blank screen</li>
+            <li><strong>Proper data merging:</strong> Combines auth data with additional profile data</li>
+            <li><strong>Improved save functionality:</strong> Updates both auth context and profile storage</li>
+        </ol>
+
+        <h3>Key Code Changes:</h3>
+        <pre>
+// Before: Separate user management
+const [user, setUser] = useState&lt;any&gt;(null);
+const savedUser = storage.getUser();
+
+// After: Integrated with AuthContext  
+const { authState, updateProfile } = useAuth();
+if (authState.user) {
+  // Merge auth user with profile data
+}
+        </pre>
+
+        <h2>Expected Result</h2>
+        <div class="success">
+            ✅ Profile screen should now display user information from authentication
+        </div>
+        
+        <p class="info">
+            <strong>To verify the fix:</strong>
+        </p>
+        <ol>
+            <li>Start the development server with <code>npm run dev</code></li>
+            <li>Login with any of the test credentials (e.g., admin@ulimi.com / Admin@123)</li>
+            <li>Navigate to the Profile page</li>
+            <li>The profile should now display the authenticated user's information</li>
+        </ol>
+
+        <h3>Test Credentials:</h3>
+        <ul>
+            <li><strong>Admin:</strong> admin@ulimi.com / Admin@123</li>
+            <li><strong>Farmer:</strong> john.mwanza@example.com / Farmer@123</li>
+            <li><strong>Customer:</strong> mary.banda@example.com / Customer@123</li>
+        </ul>
+    </div>
+</body>
+</html>
