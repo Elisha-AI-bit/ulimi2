@@ -298,34 +298,6 @@ const Login: React.FC = () => {
             )}
           </div>
         )}
-        {isRegister && (
-          <div className="mb-4 md:mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              I want to register as:
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {(['farmer', 'customer'] as const).map((role) => (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => {
-                    setRegisterForm(prev => ({ ...prev, role }));
-                  }}
-                  className={`p-3 md:p-4 rounded-lg border-2 text-sm font-medium transition-colors touch-manipulation min-h-[60px] active:scale-95 ${
-                    registerForm.role === role
-                      ? 'border-green-600 bg-green-50 text-green-800'
-                      : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 active:bg-gray-50'
-                  }`}
-                >
-                  {role === 'farmer' && '👨‍🌾'}
-                  {role === 'customer' && '🛒'}
-                  <div className="mt-1 capitalize">{role}</div>
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-2">Admin accounts are created by administrators only</p>
-          </div>
-        )}
 
         {/* Account Lockout Warning */}
         {isAccountLocked && (
