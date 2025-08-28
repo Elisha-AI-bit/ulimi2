@@ -454,6 +454,7 @@ const Login: React.FC = () => {
         ) : (
           /* Register Form */
           <div className="space-y-4">
+            <form onSubmit={handleRegisterSubmit} className="space-y-4">
             {/* Role Selection for Registration */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -467,10 +468,10 @@ const Login: React.FC = () => {
                     onClick={() => {
                       setRegisterForm(prev => ({ ...prev, role }));
                     }}
-                    className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${
+                    className={`p-3 md:p-4 rounded-lg border-2 text-sm font-medium transition-colors touch-manipulation min-h-[60px] active:scale-95 ${
                       registerForm.role === role
                         ? 'border-green-600 bg-green-50 text-green-800'
-                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                        : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 active:bg-gray-50'
                     }`}
                   >
                     {role === 'farmer' && '👨‍🌾'}
@@ -479,57 +480,55 @@ const Login: React.FC = () => {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-gray-500 mt-2">Admin and USSD accounts are created by administrators</p>
+              <p className="text-xs text-gray-500 mt-2">Admin accounts are created by administrators only</p>
             </div>
-
-            <form onSubmit={handleRegisterSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
               </label>
               <input
                 type="text"
                 value={registerForm.name}
                 onChange={(e) => setRegisterForm(prev => ({ ...prev, name: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                 placeholder="Enter your full name"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email
               </label>
               <input
                 type="email"
                 value={registerForm.email}
                 onChange={(e) => setRegisterForm(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                 placeholder="Enter your email"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Phone Number
               </label>
               <input
                 type="tel"
                 value={registerForm.phone}
                 onChange={(e) => setRegisterForm(prev => ({ ...prev, phone: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                 placeholder="+260 97 123 4567"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Province
               </label>
               <select
                 value={registerForm.province}
                 onChange={(e) => setRegisterForm(prev => ({ ...prev, province: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                 required
               >
                 {provinces.map(province => (
@@ -537,29 +536,29 @@ const Login: React.FC = () => {
                 ))}
               </select>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
                 <input
                   type="password"
                   value={registerForm.password}
                   onChange={(e) => setRegisterForm(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                   placeholder="Create a strong password"
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Confirm Password
                 </label>
                 <input
                   type="password"
                   value={registerForm.confirmPassword}
                   onChange={(e) => setRegisterForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full px-4 py-3 md:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base md:text-sm transition-colors"
                   placeholder="Confirm your password"
                   required
                 />
@@ -571,7 +570,7 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={authState.loading}
-              className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-green-600 text-white py-4 md:py-3 px-4 rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium text-base touch-manipulation active:scale-95"
             >
               {authState.loading ? 'Creating Account...' : 'Create Account'}
             </button>
