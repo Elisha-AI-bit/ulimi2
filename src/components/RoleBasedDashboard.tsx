@@ -3,7 +3,6 @@ import { useAuth } from '../contexts/AuthContext';
 import FarmerDashboard from './FarmerDashboard';
 import CustomerDashboard from './CustomerDashboard';
 import AdminDashboard from './AdminDashboard';
-import USSDDashboard from './USSDDashboard';
 
 const RoleBasedDashboard: React.FC<{ onPageChange?: (page: string) => void }> = ({ onPageChange }) => {
   const { authState } = useAuth();
@@ -27,8 +26,6 @@ const RoleBasedDashboard: React.FC<{ onPageChange?: (page: string) => void }> = 
       return <CustomerDashboard onPageChange={onPageChange} />;
     case 'admin':
       return <AdminDashboard onPageChange={onPageChange} />;
-    case 'ussd_user':
-      return <USSDDashboard onPageChange={onPageChange} />;
     default:
       return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center">

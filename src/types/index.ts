@@ -4,7 +4,7 @@ export interface User {
   email: string;
   phone: string;
   username?: string;
-  role: 'admin' | 'farmer' | 'customer' | 'ussd_user';
+  role: 'admin' | 'farmer' | 'customer';
   location: {
     province: string;
     district: string;
@@ -48,7 +48,7 @@ export type Permission =
 
 export interface Role {
   id: string;
-  name: 'admin' | 'farmer' | 'customer' | 'ussd_user';
+  name: 'admin' | 'farmer' | 'customer';
   displayName: string;
   description: string;
   permissions: Permission[];
@@ -68,10 +68,7 @@ export interface LoginCredentials {
   loginType: 'email' | 'phone' | 'username';
 }
 
-export interface USSDCredentials {
-  phone: string;
-  pin: string;
-}
+
 
 export interface RegisterData {
   name: string;

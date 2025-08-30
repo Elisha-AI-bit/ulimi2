@@ -59,7 +59,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
     setShowUserMenu(false);
   };
 
-  const handleRoleSwitch = (newRole: 'admin' | 'farmer' | 'customer' | 'ussd_user') => {
+  const handleRoleSwitch = (newRole: 'admin' | 'farmer' | 'customer') => {
     const success = switchRole(newRole);
     if (success) {
       setShowRoleSwitcher(false);
@@ -69,8 +69,6 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
       } else if (newRole === 'customer') {
         onPageChange('marketplace');
       } else if (newRole === 'admin') {
-        onPageChange('dashboard');
-      } else if (newRole === 'ussd_user') {
         onPageChange('dashboard');
       }
     }
@@ -208,7 +206,6 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                     {user?.role === 'farmer' && '👨‍🌾'}
                     {user?.role === 'customer' && '🛒'}
                     {user?.role === 'admin' && '👑'}
-                    {user?.role === 'ussd_user' && '📱'}
                   </span>
                   <span className="capitalize hidden md:inline">{user?.role}</span>
                   <span className="text-xs">▼</span>
@@ -220,7 +217,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-xs text-gray-500 font-medium">Switch Role</p>
                     </div>
-                    {(['admin', 'farmer', 'customer', 'ussd_user'] as const).map((role) => (
+                    {(['admin', 'farmer', 'customer'] as const).map((role) => (
                       <button
                         key={role}
                         onClick={() => handleRoleSwitch(role)}
@@ -234,7 +231,6 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                           {role === 'farmer' && '👨‍🌾'}
                           {role === 'customer' && '🛒'}
                           {role === 'admin' && '👑'}
-                          {role === 'ussd_user' && '📱'}
                         </span>
                         <div className="text-left">
                           <div className="capitalize font-medium">{role.replace('_', ' ')}</div>
@@ -242,7 +238,6 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                             {role === 'farmer' && 'Manage farms & crops'}
                             {role === 'customer' && 'Browse & buy products'}
                             {role === 'admin' && 'System administration'}
-                            {role === 'ussd_user' && 'Simplified mobile access'}
                           </div>
                         </div>
                         {user?.role === role && (

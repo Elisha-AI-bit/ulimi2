@@ -1,16 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { AuthState, User, LoginCredentials, USSDCredentials, RegisterData, SecurityLog, Permission } from '../types';
+import { AuthState, User, LoginCredentials, RegisterData, SecurityLog, Permission } from '../types';
 import { storage } from '../utils/storage';
 import { PermissionManager, SecurityManager, ROLE_PERMISSIONS } from '../utils/rbac';
 
 interface AuthContextType {
   authState: AuthState;
   login: (credentials: LoginCredentials) => Promise<{ success: boolean; message?: string }>;
-  loginUSSD: (credentials: USSDCredentials) => Promise<{ success: boolean; message?: string }>;
   register: (data: RegisterData) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
-  switchRole: (newRole: 'admin' | 'farmer' | 'customer' | 'ussd_user') => boolean;
+  switchRole: (newRole: 'admin' | 'farmer' | 'customer') => boolean;
   hasPermission: (permission: Permission) => boolean;
   canAccessFeature: (feature: string) => boolean;
   securityLog: SecurityLog[];
@@ -66,41 +65,22 @@ const MOCK_USERS: User[] = [
     language: 'en',
     isActive: true,
     createdAt: new Date().toISOString()
-  },
-  {
-    id: 'ussd_001',
-    name: 'Joseph Tembo',
-    email: 'josephussd@ulimi.com',
-    phone: '+260977555123',
-    username: 'josephussd',
-    role: 'ussd_user',
-    location: {
-      province: 'Central',
-      district: 'Kabwe'
-    },
-    language: 'en',
-    isActive: true,
-    createdAt: new Date().toISOString()
   }
 ];
 
 // Mock credentials database
-const MOCK_CREDENTIALS: Record<string, { password?: string; pin?: string }> = {
+const MOCK_CREDENTIALS: Record<string, { password: string }> = {
   'admin@ulimi.com': { password: 'Admin@123' },
   'admin': { password: 'Admin@123' },
   '+260977000001': { password: 'Admin@123' },
   
   'mirriam@ulimi.com': { password: 'Farmer@123' },
   'mirriam': { password: 'Farmer@123' },
-  '+260977123456': { password: 'Farmer@123', pin: '1234' },
+  '+260977123456': { password: 'Farmer@123' },
   
   'natasha@ulimi.com': { password: 'Customer@123' },
   'natasha': { password: 'Customer@123' },
-  '+260977987654': { password: 'Customer@123' },
-  
-  'josephussd@ulimi.com': { password: 'USSD@123' },
-  'josephussd': { password: 'USSD@123' },
-  '+260977555123': { password: 'USSD@123', pin: '5678' }
+  '+260977987654': { password: 'Customer@123' }
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -219,62 +199,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const loginUSSD = async (credentials: USSDCredentials): Promise<{ success: boolean; message?: string }> => {
-    updateAuthState(null, false);
-    setAuthState(prev => ({ ...prev, loading: true }));
-    
-    // Check if account is locked
-    if (SecurityManager.isAccountLocked(credentials.phone)) {
-      const remainingTime = SecurityManager.getRemainingLockoutTime(credentials.phone);
-      logSecurityEvent('failed_login', `USSD account locked - ${credentials.phone}`);
-      updateAuthState(null, false);
-      return {
-        success: false,
-        message: `Account temporarily locked. Try again in ${remainingTime} minutes.`
-      };
-    }
-    
-    // Simulate USSD delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Find USSD user by phone
-    let user = MOCK_USERS.find(u => u.phone === credentials.phone && u.role === 'ussd_user');
-    
-    // Check PIN credentials
-    const userCredentials = MOCK_CREDENTIALS[credentials.phone];
-    const isValidPin = userCredentials?.pin === credentials.pin;
-    
-    if (user && isValidPin && user.isActive) {
-      // Clear failed attempts on successful login
-      SecurityManager.clearFailedAttempts(credentials.phone);
-      
-      // Update last login
-      user = { ...user, lastLogin: new Date().toISOString() };
-      
-      storage.saveUser(user);
-      updateAuthState(user, true);
-      
-      logSecurityEvent('login', `Successful USSD login`, user.id);
-      
-      return { success: true, message: 'USSD login successful' };
-    } else {
-      // Record failed attempt
-      SecurityManager.recordFailedAttempt(credentials.phone);
-      
-      const failureReason = !user ? 'USSD user not found' : 
-                           !user.isActive ? 'Account inactive' : 
-                           'Invalid PIN';
-      
-      logSecurityEvent('failed_login', `Failed USSD login: ${failureReason} - ${credentials.phone}`);
-      updateAuthState(null, false);
-      
-      return {
-        success: false,
-        message: 'Invalid phone number or PIN'
-      };
-    }
-  };
-
   const register = async (data: RegisterData): Promise<{ success: boolean; message?: string }> => {
     setAuthState(prev => ({ ...prev, loading: true }));
     
@@ -363,7 +287,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const switchRole = (newRole: 'admin' | 'farmer' | 'customer' | 'ussd_user'): boolean => {
+  const switchRole = (newRole: 'admin' | 'farmer' | 'customer'): boolean => {
     if (!authState.user) return false;
     
     // Check if role switch is allowed
@@ -398,7 +322,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     <AuthContext.Provider value={{
       authState,
       login,
-      loginUSSD,
       register,
       logout,
       updateProfile,

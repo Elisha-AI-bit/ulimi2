@@ -183,7 +183,6 @@ export const useRole = () => {
     isAdmin: authState.user?.role === 'admin',
     isFarmer: authState.user?.role === 'farmer',
     isCustomer: authState.user?.role === 'customer',
-    isUSSDUser: authState.user?.role === 'ussd_user',
     canSwitchToRole: (targetRole: string) => 
       PermissionManager.canSwitchToRole(authState.user, targetRole)
   };

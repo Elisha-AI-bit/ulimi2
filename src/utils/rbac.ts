@@ -48,19 +48,6 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     'receive_notifications',
     'update_profile',
     'view_weather'
-  ],
-  ussd_user: [
-    'manage_farm_profile',
-    'add_products',
-    'update_products',
-    'receive_soil_advice',
-    'receive_plant_advice',
-    'browse_marketplace',
-    'place_orders',
-    'track_orders',
-    'track_deliveries',
-    'receive_notifications',
-    'view_weather'
   ]
 };
 
@@ -88,14 +75,6 @@ export const ROLES: Role[] = [
     displayName: 'Customer',
     description: 'Browse marketplace, place orders, and manage purchases',
     permissions: ROLE_PERMISSIONS.customer,
-    isActive: true
-  },
-  {
-    id: 'ussd_user',
-    name: 'ussd_user',
-    displayName: 'USSD User',
-    description: 'Access via USSD with farming and marketplace features',
-    permissions: ROLE_PERMISSIONS.ussd_user,
     isActive: true
   }
 ];
@@ -225,8 +204,8 @@ export class PermissionManager {
     // Admin can switch to any role
     if (currentUser.role === 'admin') return this.isValidRole(targetRole);
     
-    // Regular users can only switch between farmer, customer, and ussd_user
-    const allowedRoles = ['farmer', 'customer', 'ussd_user'];
+    // Regular users can only switch between farmer and customer
+    const allowedRoles = ['farmer', 'customer'];
     return allowedRoles.includes(targetRole) && this.isValidRole(targetRole);
   }
 }

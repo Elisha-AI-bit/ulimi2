@@ -1,6 +1,7 @@
 import React from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
+import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import RoleBasedDashboard from './components/RoleBasedDashboard';
 import Layout from './components/Layout';
@@ -22,6 +23,8 @@ import { PermissionManager } from './utils/rbac';
 const AppContent: React.FC = () => {
   const { authState } = useAuth();
   const [currentPage, setCurrentPage] = React.useState('dashboard');
+  const [showLogin, setShowLogin] = React.useState(false);
+  const [showRegister, setShowRegister] = React.useState(false);
 
   // Show loading spinner while checking authentication
   if (authState.loading) {
@@ -37,23 +40,24 @@ const AppContent: React.FC = () => {
 
   // Show login page if not authenticated
   if (!authState.isAuthenticated) {
-    return <Login />;
-  }
-
-  // Role-based dashboard rendering
-  const renderRoleBasedDashboard = () => {
-    // For USSD users, show simplified dashboard without complex layout
-    if (authState.user?.role === 'ussd_user') {
-      return <RoleBasedDashboard />;
+    if (showLogin || showRegister) {
+      return (
+        <Login 
+          onShowLanding={() => {
+            setShowLogin(false);
+            setShowRegister(false);
+          }}
+        />
+      );
     }
     
-    // For all other roles (admin, farmer, customer), use the layout with navigation
     return (
-      <Layout currentPage={currentPage} onPageChange={setCurrentPage}>
-        {currentPage === 'dashboard' ? <RoleBasedDashboard onPageChange={setCurrentPage} /> : renderCurrentPage()}
-      </Layout>
+      <LandingPage 
+        onShowLogin={() => setShowLogin(true)}
+        onShowRegister={() => setShowRegister(true)}
+      />
     );
-  };
+  }
 
   const renderCurrentPage = () => {
     // Admin users have access to all pages
@@ -141,7 +145,12 @@ const AppContent: React.FC = () => {
     }
   };
 
-  return renderRoleBasedDashboard();
+  // Role-based dashboard rendering with layout
+  return (
+    <Layout currentPage={currentPage} onPageChange={setCurrentPage}>
+      {currentPage === 'dashboard' ? <RoleBasedDashboard onPageChange={setCurrentPage} /> : renderCurrentPage()}
+    </Layout>
+  );
 };
 
 function App() {
