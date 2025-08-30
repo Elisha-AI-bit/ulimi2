@@ -9,7 +9,7 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<{ success: boolean; message?: string }>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
-  switchRole: (newRole: 'admin' | 'farmer' | 'customer') => boolean;
+  switchRole: (newRole: 'admin' | 'farmer' | 'customer' | 'vendor') => boolean;
   hasPermission: (permission: Permission) => boolean;
   canAccessFeature: (feature: string) => boolean;
   securityLog: SecurityLog[];
@@ -65,6 +65,22 @@ const MOCK_USERS: User[] = [
     language: 'en',
     isActive: true,
     createdAt: new Date().toISOString()
+  },
+  {
+    id: 'vendor_001',
+    name: 'David Seeds Co.',
+    email: 'david@ulimi.com',
+    phone: '+260977555123',
+    username: 'david',
+    role: 'vendor',
+    location: {
+      province: 'Lusaka',
+      district: 'Lusaka',
+      coordinates: [-15.3875, 28.3228] as [number, number]
+    },
+    language: 'en',
+    isActive: true,
+    createdAt: new Date().toISOString()
   }
 ];
 
@@ -80,7 +96,11 @@ const MOCK_CREDENTIALS: Record<string, { password: string }> = {
   
   'natasha@ulimi.com': { password: 'Customer@123' },
   'natasha': { password: 'Customer@123' },
-  '+260977987654': { password: 'Customer@123' }
+  '+260977987654': { password: 'Customer@123' },
+  
+  'david@ulimi.com': { password: 'Vendor@123' },
+  'david': { password: 'Vendor@123' },
+  '+260977555123': { password: 'Vendor@123' }
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -287,7 +307,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const switchRole = (newRole: 'admin' | 'farmer' | 'customer'): boolean => {
+  const switchRole = (newRole: 'admin' | 'farmer' | 'customer' | 'vendor'): boolean => {
     if (!authState.user) return false;
     
     // Check if role switch is allowed

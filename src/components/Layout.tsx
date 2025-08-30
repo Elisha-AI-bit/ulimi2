@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Home, Sprout, ShoppingCart, Brain, Cloud, CheckSquare, Package, User, Globe, LogOut, Zap, Cpu, Droplets } from 'lucide-react';
+import { Menu, X, Home, Sprout, ShoppingCart, Brain, Cloud, CheckSquare, Package, User, Globe, LogOut, Zap, Cpu, Droplets, MessageSquare, Users, Settings, BarChart3, Database, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage, LanguageSwitcher } from '../contexts/LanguageContext';
 import { storage } from '../utils/storage';
@@ -40,26 +40,81 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
     };
   }, []);
 
-  const navigation = [
-    { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
-    { name: t('farms'), icon: Sprout, page: 'farms', permission: 'manage_farm_profile' },
-    { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
-    { name: t('ai_advisor'), icon: Brain, page: 'ai-advisor', permission: 'receive_soil_advice' },
-    { name: 'AI Decision Support', icon: Zap, page: 'ai-decision-support', permission: 'receive_soil_advice' },
-    { name: 'AI Capabilities', icon: Cpu, page: 'ai-capabilities', permission: 'receive_soil_advice' },
-    { name: t('weather'), icon: Cloud, page: 'weather', permission: 'view_weather' },
-    { name: t('tasks'), icon: CheckSquare, page: 'tasks', permission: 'manage_farm_profile' },
-    { name: t('inventory'), icon: Package, page: 'inventory', permission: 'add_products' },
-    { name: 'IoT Smart Irrigation', icon: Droplets, page: 'iot-irrigation', permission: 'manage_farm_profile' },
-    { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
-  ];
+  // Role-specific navigation
+  const getNavigationForRole = () => {
+    const commonNavigation = [
+      { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
+      { name: 'Community Forum', icon: MessageSquare, page: 'forum', permission: null },
+      { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
+    ];
+
+    if (user?.role === 'admin') {
+      return [
+        { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
+        { name: 'User Management', icon: Users, page: 'user-management', permission: 'manage_users' },
+        { name: 'System Settings', icon: Settings, page: 'system-settings', permission: 'configure_system' },
+        { name: 'Analytics & Reports', icon: BarChart3, page: 'analytics', permission: 'view_analytics' },
+        { name: 'System Monitoring', icon: Database, page: 'system-monitoring', permission: 'view_reports' },
+        { name: 'Security & Access', icon: Shield, page: 'security', permission: 'manage_users' },
+        { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
+        { name: 'Community Forum', icon: MessageSquare, page: 'forum', permission: null },
+        { name: t('weather'), icon: Cloud, page: 'weather', permission: 'view_weather' },
+        { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
+      ];
+    }
+
+    if (user?.role === 'farmer') {
+      return [
+        { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
+        { name: t('farms'), icon: Sprout, page: 'farms', permission: 'manage_farm_profile' },
+        { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
+        { name: t('ai_advisor'), icon: Brain, page: 'ai-advisor', permission: 'receive_soil_advice' },
+        { name: 'AI Decision Support', icon: Zap, page: 'ai-decision-support', permission: 'receive_soil_advice' },
+        { name: 'AI Capabilities', icon: Cpu, page: 'ai-capabilities', permission: 'receive_soil_advice' },
+        { name: t('weather'), icon: Cloud, page: 'weather', permission: 'view_weather' },
+        { name: t('tasks'), icon: CheckSquare, page: 'tasks', permission: 'manage_farm_profile' },
+        { name: t('inventory'), icon: Package, page: 'inventory', permission: 'add_products' },
+        { name: 'IoT Smart Irrigation', icon: Droplets, page: 'iot-irrigation', permission: 'manage_farm_profile' },
+        { name: 'Community Forum', icon: MessageSquare, page: 'forum', permission: null },
+        { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
+      ];
+    }
+
+    if (user?.role === 'customer') {
+      return [
+        { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
+        { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
+        { name: 'My Orders', icon: Package, page: 'orders', permission: 'place_orders' },
+        { name: 'Community Forum', icon: MessageSquare, page: 'forum', permission: null },
+        { name: t('weather'), icon: Cloud, page: 'weather', permission: 'view_weather' },
+        { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
+      ];
+    }
+
+    if (user?.role === 'vendor') {
+      return [
+        { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
+        { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
+        { name: 'My Products', icon: Package, page: 'vendor-products', permission: 'manage_products' },
+        { name: 'Sales Analytics', icon: BarChart3, page: 'vendor-analytics', permission: 'view_sales_analytics' },
+        { name: 'Orders Management', icon: CheckSquare, page: 'vendor-orders', permission: 'manage_orders' },
+        { name: 'Community Forum', icon: MessageSquare, page: 'forum', permission: null },
+        { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
+      ];
+    }
+
+    // Default navigation for unknown roles
+    return commonNavigation;
+  };
+
+  const navigation = getNavigationForRole();
 
   const handleLogout = () => {
     logout();
     setShowUserMenu(false);
   };
 
-  const handleRoleSwitch = (newRole: 'admin' | 'farmer' | 'customer') => {
+  const handleRoleSwitch = (newRole: 'admin' | 'farmer' | 'customer' | 'vendor') => {
     const success = switchRole(newRole);
     if (success) {
       setShowRoleSwitcher(false);
@@ -69,6 +124,8 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
       } else if (newRole === 'customer') {
         onPageChange('marketplace');
       } else if (newRole === 'admin') {
+        onPageChange('dashboard');
+      } else if (newRole === 'vendor') {
         onPageChange('dashboard');
       }
     }
@@ -206,6 +263,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                     {user?.role === 'farmer' && '👨‍🌾'}
                     {user?.role === 'customer' && '🛒'}
                     {user?.role === 'admin' && '👑'}
+                    {user?.role === 'vendor' && '🏪'}
                   </span>
                   <span className="capitalize hidden md:inline">{user?.role}</span>
                   <span className="text-xs">▼</span>
@@ -217,7 +275,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                     <div className="px-4 py-2 border-b border-gray-100">
                       <p className="text-xs text-gray-500 font-medium">Switch Role</p>
                     </div>
-                    {(['admin', 'farmer', 'customer'] as const).map((role) => (
+                    {(['admin', 'farmer', 'customer', 'vendor'] as const).map((role) => (
                       <button
                         key={role}
                         onClick={() => handleRoleSwitch(role)}
@@ -231,6 +289,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                           {role === 'farmer' && '👨‍🌾'}
                           {role === 'customer' && '🛒'}
                           {role === 'admin' && '👑'}
+                          {role === 'vendor' && '🏪'}
                         </span>
                         <div className="text-left">
                           <div className="capitalize font-medium">{role.replace('_', ' ')}</div>
@@ -238,6 +297,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
                             {role === 'farmer' && 'Manage farms & crops'}
                             {role === 'customer' && 'Browse & buy products'}
                             {role === 'admin' && 'System administration'}
+                            {role === 'vendor' && 'Sell products & manage inventory'}
                           </div>
                         </div>
                         {user?.role === role && (

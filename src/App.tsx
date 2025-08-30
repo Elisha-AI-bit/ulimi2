@@ -4,8 +4,10 @@ import { LanguageProvider } from './contexts/LanguageContext';
 import LandingPage from './components/LandingPage';
 import Login from './components/Login';
 import RoleBasedDashboard from './components/RoleBasedDashboard';
+import VendorDashboard from './components/VendorDashboard';
+import CustomerDashboard from './components/CustomerDashboard';
+import CommunityForum from './components/CommunityForum';
 import Layout from './components/Layout';
-import Dashboard from './components/Dashboard';
 import FarmManagement from './components/FarmManagement';
 import Marketplace from './components/Marketplace';
 import AIAdvisor from './components/AIAdvisor';
@@ -16,6 +18,7 @@ import TaskManagement from './components/TaskManagement';
 import Inventory from './components/Inventory';
 import UserProfile from './components/UserProfile';
 import IoTSmartIrrigation from './components/IoTSmartIrrigation';
+import AdminDashboard from './components/AdminDashboard';
 import { UnauthorizedAccess } from './utils/rbac-components';
 import { PermissionManager } from './utils/rbac';
 
@@ -60,11 +63,62 @@ const AppContent: React.FC = () => {
   }
 
   const renderCurrentPage = () => {
+    // Handle dashboard page with role-specific components
+    if (currentPage === 'dashboard') {
+      if (authState.user?.role === 'vendor') {
+        return <VendorDashboard onPageChange={setCurrentPage} />;
+      } else if (authState.user?.role === 'customer') {
+        return <CustomerDashboard onPageChange={setCurrentPage} />;
+      } else {
+        return <RoleBasedDashboard onPageChange={setCurrentPage} />;
+      }
+    }
+    
     // Admin users have access to all pages
     if (authState.user?.role === 'admin') {
       switch (currentPage) {
-        case 'dashboard':
-          return <Dashboard onPageChange={setCurrentPage} />;
+        case 'user-management':
+          return (
+            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+              <div className="max-w-7xl mx-auto">
+                <AdminDashboard onPageChange={setCurrentPage} initialTab="users" />
+              </div>
+            </div>
+          );
+        case 'system-settings':
+          return (
+            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+              <div className="max-w-7xl mx-auto">
+                <AdminDashboard onPageChange={setCurrentPage} initialTab="system" />
+              </div>
+            </div>
+          );
+        case 'analytics':
+          return (
+            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+              <div className="max-w-7xl mx-auto">
+                <AdminDashboard onPageChange={setCurrentPage} initialTab="analytics" />
+              </div>
+            </div>
+          );
+        case 'system-monitoring':
+          return (
+            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+              <div className="max-w-7xl mx-auto">
+                <AdminDashboard onPageChange={setCurrentPage} initialTab="system" />
+              </div>
+            </div>
+          );
+        case 'security':
+          return (
+            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+              <div className="max-w-7xl mx-auto">
+                <AdminDashboard onPageChange={setCurrentPage} initialTab="system" />
+              </div>
+            </div>
+          );
+        case 'forum':
+          return <CommunityForum />;
         case 'farms':
           return <FarmManagement />;
         case 'marketplace':
@@ -86,13 +140,13 @@ const AppContent: React.FC = () => {
         case 'profile':
           return <UserProfile />;
         default:
-          return <Dashboard />;
+          return <RoleBasedDashboard onPageChange={setCurrentPage} />;
       }
     }
     
     // Check if user has permission to access the current page
     const pagePermissions: Record<string, string[]> = {
-      'dashboard': [], // Dashboard accessible to all authenticated users
+      'forum': [], // Forum accessible to all authenticated users
       'farms': ['manage_farm_profile'],
       'marketplace': ['browse_marketplace'],
       'ai-advisor': ['receive_soil_advice', 'receive_plant_advice'],
@@ -118,8 +172,8 @@ const AppContent: React.FC = () => {
     }
 
     switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard onPageChange={setCurrentPage} />;
+      case 'forum':
+        return <CommunityForum />;
       case 'farms':
         return <FarmManagement />;
       case 'marketplace':
@@ -141,14 +195,14 @@ const AppContent: React.FC = () => {
       case 'profile':
         return <UserProfile />;
       default:
-        return <Dashboard />;
+        return <RoleBasedDashboard onPageChange={setCurrentPage} />;
     }
   };
 
   // Role-based dashboard rendering with layout
   return (
     <Layout currentPage={currentPage} onPageChange={setCurrentPage}>
-      {currentPage === 'dashboard' ? <RoleBasedDashboard onPageChange={setCurrentPage} /> : renderCurrentPage()}
+      {renderCurrentPage()}
     </Layout>
   );
 };

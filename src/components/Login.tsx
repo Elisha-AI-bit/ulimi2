@@ -92,11 +92,12 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
     }
   };
 
-  const fillDemoCredentials = (userType: 'admin' | 'farmer' | 'customer') => {
+  const fillDemoCredentials = (userType: 'admin' | 'farmer' | 'customer' | 'vendor') => {
     const credentials = {
       admin: { identifier: 'admin@ulimi.com', password: 'Admin@123' },
       farmer: { identifier: 'mirriam@ulimi.com', password: 'Farmer@123' },
-      customer: { identifier: 'natasha@ulimi.com', password: 'Customer@123' }
+      customer: { identifier: 'natasha@ulimi.com', password: 'Customer@123' },
+      vendor: { identifier: 'david@ulimi.com', password: 'Vendor@123' }
     };
     
     setLoginForm({
@@ -132,7 +133,7 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
         {!isRegister && (
           <div className="mb-6 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800 mb-3 font-medium">Demo Accounts:</p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-4 gap-2">
               <button
                 onClick={() => fillDemoCredentials('admin')}
                 className="text-center text-xs text-blue-700 hover:text-blue-900 bg-white p-3 rounded border border-blue-200 hover:border-blue-300 transition-colors"
@@ -150,6 +151,12 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
                 className="text-center text-xs text-blue-700 hover:text-blue-900 bg-white p-3 rounded border border-blue-200 hover:border-blue-300 transition-colors"
               >
                 🛒<br/><strong>Customer</strong>
+              </button>
+              <button
+                onClick={() => fillDemoCredentials('vendor')}
+                className="text-center text-xs text-blue-700 hover:text-blue-900 bg-white p-3 rounded border border-blue-200 hover:border-blue-300 transition-colors"
+              >
+                🏪<br/><strong>Vendor</strong>
               </button>
             </div>
             <p className="text-xs text-blue-600 mt-2 text-center">💡 Click to try different roles</p>
@@ -215,7 +222,7 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
                 I want to register as:
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {(['farmer', 'customer'] as const).map((role) => (
+                {(['farmer', 'customer', 'vendor'] as const).map((role) => (
                   <button
                     key={role}
                     type="button"
@@ -230,6 +237,7 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
                   >
                     {role === 'farmer' && '👨‍🌾'}
                     {role === 'customer' && '🛒'}
+                    {role === 'vendor' && '🏪'}
                     <div className="mt-1 capitalize">{role}</div>
                   </button>
                 ))}

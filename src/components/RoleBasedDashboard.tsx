@@ -1,10 +1,9 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import FarmerDashboard from './FarmerDashboard';
-import CustomerDashboard from './CustomerDashboard';
 import AdminDashboard from './AdminDashboard';
 
-const RoleBasedDashboard: React.FC<{ onPageChange?: (page: string) => void }> = ({ onPageChange }) => {
+const RoleBasedDashboard: React.FC<{ onPageChange: (page: string) => void; initialTab?: 'overview' | 'users' | 'system' | 'analytics' }> = ({ onPageChange, initialTab }) => {
   const { authState } = useAuth();
   
   if (!authState.user) {
@@ -22,10 +21,8 @@ const RoleBasedDashboard: React.FC<{ onPageChange?: (page: string) => void }> = 
   switch (authState.user.role) {
     case 'farmer':
       return <FarmerDashboard onPageChange={onPageChange} />;
-    case 'customer':
-      return <CustomerDashboard onPageChange={onPageChange} />;
     case 'admin':
-      return <AdminDashboard onPageChange={onPageChange} />;
+      return <AdminDashboard onPageChange={onPageChange} initialTab={initialTab} />;
     default:
       return (
         <div className="min-h-screen bg-gray-100 flex items-center justify-center">

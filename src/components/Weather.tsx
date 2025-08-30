@@ -9,6 +9,31 @@ export default function Weather() {
   const [selectedLocation, setSelectedLocation] = useState('Lusaka');
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Default fallback weather data to ensure no blank pages
+  const fallbackWeather = {
+    location: selectedLocation,
+    temperature: 24,
+    humidity: 65,
+    windSpeed: 12,
+    rainfall: 3,
+    pressure: 1015,
+    uvIndex: 5,
+    visibility: 15,
+    conditions: 'Partly Cloudy',
+    timestamp: new Date().toISOString()
+  };
+
+  const fallbackForecast = Array.from({ length: 7 }, (_, i) => ({
+    date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString(),
+    tempMin: Math.round(Math.random() * 8 + 16),
+    tempMax: Math.round(Math.random() * 12 + 26),
+    humidity: Math.round(Math.random() * 30 + 50),
+    rainfall: Math.round(Math.random() * 12),
+    windSpeed: Math.round(Math.random() * 15 + 8),
+    conditions: ['Sunny', 'Partly Cloudy', 'Cloudy', 'Light Rain'][Math.floor(Math.random() * 4)]
+  }));
 
   useEffect(() => {
     loadWeatherData();
@@ -17,25 +42,20 @@ export default function Weather() {
   const loadWeatherData = async () => {
     console.log('Loading weather data for:', selectedLocation);
     setLoading(true);
+    setError(null);
+    
     try {
-      const savedWeather = storage.getWeatherData();
-      console.log('Saved weather data:', savedWeather);
-      
-      if (savedWeather && savedWeather.current) {
-        console.log('Using saved weather data');
-        setWeather(savedWeather.current);
-        setForecast(savedWeather.forecast || []);
-      } else {
-        console.log('Generating new mock weather data');
-        await generateMockWeatherData();
-      }
-
+      // Always generate fresh mock data for demo purposes
+      await generateMockWeatherData();
       generateWeatherAlerts();
       console.log('Weather data loaded successfully');
     } catch (error) {
       console.error('Error loading weather data:', error);
-      console.log('Generating fallback weather data');
-      await generateMockWeatherData();
+      setError('Failed to load weather data');
+      // Use fallback data even on error
+      setWeather(fallbackWeather);
+      setForecast(fallbackForecast);
+      generateWeatherAlerts();
     } finally {
       setLoading(false);
     }
@@ -43,29 +63,49 @@ export default function Weather() {
 
   const generateMockWeatherData = async () => {
     console.log('Generating mock weather data for:', selectedLocation);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Create more realistic weather data for Zambian locations
+    const locationWeatherVariations = {
+      'Lusaka': { tempBase: 26, rainBase: 5, humidityBase: 60 },
+      'Kitwe': { tempBase: 24, rainBase: 8, humidityBase: 70 },
+      'Ndola': { tempBase: 23, rainBase: 7, humidityBase: 68 },
+      'Livingstone': { tempBase: 28, rainBase: 3, humidityBase: 55 },
+      'Chipata': { tempBase: 25, rainBase: 6, humidityBase: 65 },
+      'Kabwe': { tempBase: 25, rainBase: 5, humidityBase: 62 },
+      'Chingola': { tempBase: 23, rainBase: 9, humidityBase: 72 },
+      'Mufulira': { tempBase: 24, rainBase: 8, humidityBase: 69 },
+      'Kasama': { tempBase: 22, rainBase: 10, humidityBase: 75 },
+      'Mazabuka': { tempBase: 27, rainBase: 4, humidityBase: 58 },
+      'Choma': { tempBase: 26, rainBase: 4, humidityBase: 57 },
+      'Mongu': { tempBase: 27, rainBase: 6, humidityBase: 63 },
+      'Solwezi': { tempBase: 25, rainBase: 7, humidityBase: 66 }
+    };
+    
+    const locationData = locationWeatherVariations[selectedLocation as keyof typeof locationWeatherVariations] || locationWeatherVariations['Lusaka'];
+    
+    await new Promise(resolve => setTimeout(resolve, 300)); // Shorter delay
     
     const currentWeather = {
       location: selectedLocation,
-      temperature: Math.round(Math.random() * 15 + 20),
-      humidity: Math.round(Math.random() * 40 + 40),
-      windSpeed: Math.round(Math.random() * 20 + 5),
-      rainfall: Math.round(Math.random() * 10),
-      pressure: Math.round(Math.random() * 50 + 1000),
-      uvIndex: Math.round(Math.random() * 10 + 1),
-      visibility: Math.round(Math.random() * 5 + 10),
-      conditions: ['Sunny', 'Partly Cloudy', 'Cloudy', 'Light Rain', 'Heavy Rain'][Math.floor(Math.random() * 5)],
+      temperature: Math.round(locationData.tempBase + (Math.random() - 0.5) * 8),
+      humidity: Math.round(locationData.humidityBase + (Math.random() - 0.5) * 20),
+      windSpeed: Math.round(Math.random() * 15 + 8),
+      rainfall: Math.round(locationData.rainBase + Math.random() * 8),
+      pressure: Math.round(Math.random() * 30 + 1005),
+      uvIndex: Math.round(Math.random() * 8 + 2),
+      visibility: Math.round(Math.random() * 8 + 12),
+      conditions: ['Sunny', 'Partly Cloudy', 'Cloudy', 'Light Rain', 'Clear'][Math.floor(Math.random() * 5)],
       timestamp: new Date().toISOString()
     };
 
     const forecastData = Array.from({ length: 7 }, (_, i) => ({
       date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString(),
-      tempMin: Math.round(Math.random() * 10 + 15),
-      tempMax: Math.round(Math.random() * 15 + 25),
-      humidity: Math.round(Math.random() * 40 + 40),
-      rainfall: Math.round(Math.random() * 15),
-      windSpeed: Math.round(Math.random() * 20 + 5),
-      conditions: ['Sunny', 'Partly Cloudy', 'Cloudy', 'Light Rain', 'Heavy Rain'][Math.floor(Math.random() * 5)]
+      tempMin: Math.round(locationData.tempBase - 5 + (Math.random() - 0.5) * 6),
+      tempMax: Math.round(locationData.tempBase + 3 + (Math.random() - 0.5) * 8),
+      humidity: Math.round(locationData.humidityBase + (Math.random() - 0.5) * 25),
+      rainfall: Math.round(locationData.rainBase + Math.random() * 10),
+      windSpeed: Math.round(Math.random() * 18 + 6),
+      conditions: ['Sunny', 'Partly Cloudy', 'Cloudy', 'Light Rain', 'Clear'][Math.floor(Math.random() * 5)]
     }));
 
     console.log('Generated weather data:', currentWeather);
@@ -77,11 +117,13 @@ export default function Weather() {
     try {
       storage.saveWeatherData({
         current: currentWeather,
-        forecast: forecastData
+        forecast: forecastData,
+        lastUpdated: new Date().toISOString()
       });
       console.log('Weather data saved to storage');
     } catch (storageError) {
       console.error('Error saving weather data to storage:', storageError);
+      // Continue without saving - data is still available in state
     }
   };
 
@@ -90,8 +132,8 @@ export default function Weather() {
       {
         id: '1',
         type: 'warning',
-        title: 'Heavy Rain Expected',
-        message: 'Heavy rainfall expected in the next 48 hours. Ensure proper drainage in your fields.',
+        title: 'Heavy Rain Expected in Zambia',
+        message: `Heavy rainfall expected in ${selectedLocation} and surrounding areas in the next 48 hours. Ensure proper drainage in your fields and secure loose farm equipment.`,
         severity: 'high',
         validUntil: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
       },
@@ -99,9 +141,17 @@ export default function Weather() {
         id: '2',
         type: 'advisory',
         title: 'Optimal Planting Conditions',
-        message: 'Current weather conditions are favorable for maize planting.',
+        message: `Current weather conditions in ${selectedLocation} are favorable for maize planting. Soil moisture levels are adequate and temperatures are within optimal range.`,
         severity: 'medium',
         validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        id: '3',
+        type: 'info',
+        title: 'Zambian Rainy Season Update',
+        message: `The rainy season in ${selectedLocation} is progressing normally. Monitor soil conditions and adjust irrigation schedules accordingly.`,
+        severity: 'low',
+        validUntil: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString()
       }
     ];
     setAlerts(mockAlerts);
@@ -139,28 +189,19 @@ export default function Weather() {
   if (loading) {
     return (
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-          <span className="ml-3 text-gray-600">Loading weather data...</span>
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="flex items-center justify-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            <span className="ml-3 text-gray-600">Loading weather data for {selectedLocation}...</span>
+          </div>
         </div>
       </div>
     );
   }
 
-  const fallbackWeather = {
-    location: selectedLocation,
-    temperature: 25,
-    humidity: 60,
-    windSpeed: 10,
-    rainfall: 2,
-    pressure: 1013,
-    uvIndex: 6,
-    visibility: 12,
-    conditions: 'Partly Cloudy',
-    timestamp: new Date().toISOString()
-  };
-
+  // Always ensure we have weather data to display
   const displayWeather = weather || fallbackWeather;
+  const displayForecast = forecast.length > 0 ? forecast : fallbackForecast;
 
   return (
     <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-safe">
@@ -184,21 +225,41 @@ export default function Weather() {
         </div>
       </div>
 
-      {/* No Weather Data Message */}
-      {!weather && !loading && (
+      {/* Weather Status Info */}
+      {error && (
+        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex">
+            <AlertTriangle className="h-5 w-5 text-yellow-400 mr-3" />
+            <div>
+              <h3 className="text-sm font-medium text-yellow-800">Using Demo Weather Data</h3>
+              <p className="text-sm text-yellow-700 mt-1">
+                {error}. Displaying sample weather data for {selectedLocation}. In production, this would show real-time weather information.
+              </p>
+              <button
+                onClick={loadWeatherData}
+                className="mt-2 inline-flex items-center px-3 py-1 border border-yellow-300 rounded text-xs text-yellow-800 bg-yellow-100 hover:bg-yellow-200 transition-colors"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!error && !weather && (
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex">
             <AlertTriangle className="h-5 w-5 text-blue-400 mr-3" />
             <div>
-              <h3 className="text-sm font-medium text-blue-800">Using Demo Weather Data</h3>
+              <h3 className="text-sm font-medium text-blue-800">Demo Weather Data</h3>
               <p className="text-sm text-blue-700 mt-1">
-                Displaying sample weather data for {selectedLocation}. In production, this would show real-time weather information.
+                Displaying sample weather data for {selectedLocation}. Click refresh to generate new mock data.
               </p>
               <button
                 onClick={loadWeatherData}
-                className="mt-2 inline-flex items-center px-3 py-1 border border-blue-300 rounded text-xs text-blue-800 bg-blue-100 hover:bg-blue-200"
+                className="mt-2 inline-flex items-center px-3 py-1 border border-blue-300 rounded text-xs text-blue-800 bg-blue-100 hover:bg-blue-200 transition-colors"
               >
-                Refresh
+                Generate New Data
               </button>
             </div>
           </div>
@@ -338,65 +399,44 @@ export default function Weather() {
       </div>
 
       {/* 7-Day Forecast */}
-      {forecast.length > 0 ? (
-        <div className="mt-8 bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">7-Day Forecast</h3>
-          </div>
-          
-          <div className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
-              {forecast.map((day, index) => (
-                <div key={index} className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-sm font-medium text-gray-900 mb-2">
-                    {index === 0 ? 'Today' : 
-                     index === 1 ? 'Tomorrow' : 
-                     new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}
+      <div className="mt-8 bg-white shadow rounded-lg">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">7-Day Forecast - {selectedLocation}</h3>
+          <p className="text-sm text-gray-500">Weather predictions for the week ahead</p>
+        </div>
+        
+        <div className="p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
+            {displayForecast.map((day, index) => (
+              <div key={index} className="text-center p-4 bg-gray-50 rounded-lg">
+                <div className="text-sm font-medium text-gray-900 mb-2">
+                  {index === 0 ? 'Today' : 
+                   index === 1 ? 'Tomorrow' : 
+                   new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}
+                </div>
+                
+                <div className="flex justify-center mb-2">
+                  {getWeatherIcon(day.conditions)}
+                </div>
+                
+                <div className="text-xs text-gray-600 mb-2">{day.conditions}</div>
+                
+                <div className="space-y-1">
+                  <div className="text-sm font-semibold text-gray-900">
+                    {day.tempMax}° / {day.tempMin}°
                   </div>
-                  
-                  <div className="flex justify-center mb-2">
-                    {getWeatherIcon(day.conditions)}
+                  <div className="text-xs text-blue-600">
+                    {day.rainfall}mm rain
                   </div>
-                  
-                  <div className="text-xs text-gray-600 mb-2">{day.conditions}</div>
-                  
-                  <div className="space-y-1">
-                    <div className="text-sm font-semibold text-gray-900">
-                      {day.tempMax}° / {day.tempMin}°
-                    </div>
-                    <div className="text-xs text-blue-600">
-                      {day.rainfall}mm rain
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {day.windSpeed} km/h
-                    </div>
+                  <div className="text-xs text-gray-500">
+                    {day.windSpeed} km/h
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
-      ) : (
-        !loading && (
-          <div className="mt-8 bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-medium text-gray-900">7-Day Forecast</h3>
-            </div>
-            <div className="p-6">
-              <div className="text-center py-8">
-                <Cloud className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Forecast data not available</p>
-                <button
-                  onClick={loadWeatherData}
-                  className="mt-2 inline-flex items-center px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  Refresh
-                </button>
-              </div>
-            </div>
-          </div>
-        )
-      )}
+      </div>
 
       {/* Farming Recommendations */}
       <div className="mt-8 bg-white shadow rounded-lg">
@@ -409,43 +449,53 @@ export default function Weather() {
             <div className="space-y-4">
               <h4 className="font-medium text-gray-900">Current Conditions Advice</h4>
               <div className="space-y-3">
-                {displayWeather.rainfall > 5 && (
+                {displayWeather.rainfall > 10 && (
                   <div className="flex items-start p-3 bg-blue-50 rounded-lg">
                     <CloudRain className="h-5 w-5 text-blue-500 mr-3 mt-0.5 flex-shrink-0" />
                     <div>
                       <div className="text-sm font-medium text-blue-900">Heavy Rainfall</div>
-                      <div className="text-sm text-blue-700">Ensure proper drainage and avoid field operations</div>
+                      <div className="text-sm text-blue-700">Significant rainfall expected. Ensure proper drainage and avoid field operations during heavy downpours.</div>
                     </div>
                   </div>
                 )}
                 
-                {displayWeather.temperature > 30 && (
+                {displayWeather.temperature > 32 && (
                   <div className="flex items-start p-3 bg-orange-50 rounded-lg">
                     <Sun className="h-5 w-5 text-orange-500 mr-3 mt-0.5 flex-shrink-0" />
                     <div>
                       <div className="text-sm font-medium text-orange-900">High Temperature</div>
-                      <div className="text-sm text-orange-700">Increase irrigation frequency and provide shade for livestock</div>
+                      <div className="text-sm text-orange-700">High temperatures expected. Increase irrigation frequency and provide shade for livestock.</div>
                     </div>
                   </div>
                 )}
                 
-                {displayWeather.humidity > 70 && (
+                {displayWeather.humidity > 75 && (
                   <div className="flex items-start p-3 bg-yellow-50 rounded-lg">
                     <Droplets className="h-5 w-5 text-yellow-500 mr-3 mt-0.5 flex-shrink-0" />
                     <div>
                       <div className="text-sm font-medium text-yellow-900">High Humidity</div>
-                      <div className="text-sm text-yellow-700">Monitor for fungal diseases and improve ventilation</div>
+                      <div className="text-sm text-yellow-700">High humidity levels. Monitor for fungal diseases and improve ventilation in storage areas.</div>
+                    </div>
+                  </div>
+                )}
+                
+                {displayWeather.windSpeed > 20 && (
+                  <div className="flex items-start p-3 bg-red-50 rounded-lg">
+                    <Wind className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <div className="text-sm font-medium text-red-900">Strong Winds</div>
+                      <div className="text-sm text-red-700">Strong winds expected. Secure loose equipment and consider delaying spraying operations.</div>
                     </div>
                   </div>
                 )}
                 
                 {/* Always show at least one general recommendation */}
-                {displayWeather.rainfall <= 5 && displayWeather.temperature <= 30 && displayWeather.humidity <= 70 && (
+                {displayWeather.rainfall <= 10 && displayWeather.temperature <= 32 && displayWeather.humidity <= 75 && displayWeather.windSpeed <= 20 && (
                   <div className="flex items-start p-3 bg-green-50 rounded-lg">
                     <CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
                     <div>
                       <div className="text-sm font-medium text-green-900">Favorable Conditions</div>
-                      <div className="text-sm text-green-700">Current weather conditions are suitable for most farming activities</div>
+                      <div className="text-sm text-green-700">Current weather conditions in {selectedLocation} are suitable for most farming activities. Good time for planting, weeding, and field maintenance.</div>
                     </div>
                   </div>
                 )}
@@ -458,16 +508,24 @@ export default function Weather() {
                 <div className="flex items-start p-3 bg-green-50 rounded-lg">
                   <Calendar className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
                   <div>
-                    <div className="text-sm font-medium text-green-900">Optimal Planting Window</div>
-                    <div className="text-sm text-green-700">Next 3 days show favorable conditions for planting</div>
+                    <div className="text-sm font-medium text-green-900">Zambian Farming Calendar</div>
+                    <div className="text-sm text-green-700">Current season is suitable for land preparation and early planting activities in {selectedLocation}.</div>
                   </div>
                 </div>
                 
                 <div className="flex items-start p-3 bg-purple-50 rounded-lg">
                   <TrendingUp className="h-5 w-5 text-purple-500 mr-3 mt-0.5" />
                   <div>
-                    <div className="text-sm font-medium text-purple-900">Irrigation Schedule</div>
-                    <div className="text-sm text-purple-700">Reduce watering due to expected rainfall</div>
+                    <div className="text-sm font-medium text-purple-900">Irrigation Planning</div>
+                    <div className="text-sm text-purple-700">Based on {selectedLocation} weather patterns, adjust irrigation schedules to complement natural rainfall.</div>
+                  </div>
+                </div>
+                
+                <div className="flex items-start p-3 bg-indigo-50 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-indigo-500 mr-3 mt-0.5" />
+                  <div>
+                    <div className="text-sm font-medium text-indigo-900">Seasonal Recommendations</div>
+                    <div className="text-sm text-indigo-700">Monitor weather updates daily for optimal timing of agricultural activities in the {selectedLocation} region.</div>
                   </div>
                 </div>
               </div>

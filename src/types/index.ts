@@ -4,7 +4,7 @@ export interface User {
   email: string;
   phone: string;
   username?: string;
-  role: 'admin' | 'farmer' | 'customer';
+  role: 'admin' | 'farmer' | 'customer' | 'vendor';
   location: {
     province: string;
     district: string;
@@ -41,6 +41,12 @@ export type Permission =
   | 'rate_products'
   | 'review_products'
   
+  // Vendor permissions
+  | 'manage_products'
+  | 'view_sales_analytics'
+  | 'manage_orders'
+  | 'respond_to_inquiries'
+  
   // Universal permissions
   | 'receive_notifications'
   | 'update_profile'
@@ -48,7 +54,7 @@ export type Permission =
 
 export interface Role {
   id: string;
-  name: 'admin' | 'farmer' | 'customer';
+  name: 'admin' | 'farmer' | 'customer' | 'vendor';
   displayName: string;
   description: string;
   permissions: Permission[];
@@ -77,7 +83,7 @@ export interface RegisterData {
   username?: string;
   password: string;
   confirmPassword: string;
-  role: 'farmer' | 'customer';
+  role: 'farmer' | 'customer' | 'vendor';
   province: string;
   district: string;
   language: 'en' | 'ny' | 'bem' | 'ton';
@@ -92,7 +98,49 @@ export interface AdminStats {
   totalRevenue: number;
 }
 
-export interface CustomerOrder {
+export interface ForumPost {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  authorRole: 'farmer' | 'customer' | 'vendor';
+  category: 'general' | 'crops' | 'equipment' | 'market' | 'weather' | 'pest-control';
+  tags: string[];
+  likes: number;
+  replies: ForumReply[];
+  isSticky: boolean;
+  isClosed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ForumReply {
+  id: string;
+  postId: string;
+  content: string;
+  authorId: string;
+  authorName: string;
+  authorRole: 'farmer' | 'customer' | 'vendor';
+  likes: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ForumCategory {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  postCount: number;
+  latestPost?: {
+    title: string;
+    authorName: string;
+    createdAt: string;
+  };
+}
+
+export interface Order {
   id: string;
   customerId: string;
   items: MarketplaceItem[];

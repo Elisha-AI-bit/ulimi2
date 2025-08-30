@@ -33,6 +33,15 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     'update_products',
     'receive_soil_advice',
     'receive_plant_advice',
+    // Full marketplace access for farmers
+    'browse_marketplace',
+    'place_orders',
+    'make_payments',
+    'track_orders',
+    'track_deliveries',
+    'rate_products',
+    'review_products',
+    // Universal permissions
     'receive_notifications',
     'update_profile',
     'view_weather'
@@ -45,6 +54,18 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     'track_deliveries',
     'rate_products',
     'review_products',
+    'receive_notifications',
+    'update_profile',
+    'view_weather'
+  ],
+  vendor: [
+    'manage_products',
+    'view_sales_analytics',
+    'manage_orders',
+    'respond_to_inquiries',
+    'add_products',
+    'update_products',
+    'browse_marketplace',
     'receive_notifications',
     'update_profile',
     'view_weather'
@@ -65,7 +86,7 @@ export const ROLES: Role[] = [
     id: 'farmer',
     name: 'farmer',
     displayName: 'Farmer',
-    description: 'Manage farm operations, products, and receive agricultural advice',
+    description: 'Manage farm operations, products, receive agricultural advice, and access full marketplace features',
     permissions: ROLE_PERMISSIONS.farmer,
     isActive: true
   },
@@ -75,6 +96,14 @@ export const ROLES: Role[] = [
     displayName: 'Customer',
     description: 'Browse marketplace, place orders, and manage purchases',
     permissions: ROLE_PERMISSIONS.customer,
+    isActive: true
+  },
+  {
+    id: 'vendor',
+    name: 'vendor',
+    displayName: 'Vendor',
+    description: 'Sell products, manage inventory, and handle customer orders',
+    permissions: ROLE_PERMISSIONS.vendor,
     isActive: true
   }
 ];
@@ -204,8 +233,8 @@ export class PermissionManager {
     // Admin can switch to any role
     if (currentUser.role === 'admin') return this.isValidRole(targetRole);
     
-    // Regular users can only switch between farmer and customer
-    const allowedRoles = ['farmer', 'customer'];
+    // Regular users can only switch between farmer, customer, and vendor
+    const allowedRoles = ['farmer', 'customer', 'vendor'];
     return allowedRoles.includes(targetRole) && this.isValidRole(targetRole);
   }
 }
