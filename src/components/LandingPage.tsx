@@ -43,8 +43,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowRegister }
     "Increase crop yields by up to 30%",
     "Reduce farming costs and resource waste",
     "Access to modern farming techniques",
-    "Direct market access for better profits",
-    "Weather forecasting and alerts",
+    "Access to Zambian market prices and trends",
+    "Weather forecasting tailored to Zambian regions",
     "Community support and knowledge sharing"
   ];
 
@@ -71,8 +71,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowRegister }
                 </h2>
                 
                 <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  Transform your farming with AI-powered insights, smart irrigation, weather forecasting, 
-                  and a community marketplace. Join thousands of farmers already growing smarter.
+                  Transform your farming in Zambia with AI-powered insights, smart irrigation, weather forecasting, 
+                  and a community marketplace. Join thousands of Zambian farmers already growing smarter.
                 </p>
                 
                 <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
@@ -109,7 +109,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowRegister }
             />
             <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
               <div className="text-center text-white">
-                <p className="text-xl font-semibold drop-shadow-lg">Empowering African Agriculture</p>
+                <p className="text-xl font-semibold drop-shadow-lg">Empowering Zambian Agriculture</p>
               </div>
             </div>
           </div>
@@ -150,7 +150,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowRegister }
           <div className="lg:text-center">
             <h2 className="text-base text-green-600 font-semibold tracking-wide uppercase">Benefits</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Why farmers choose ULIMI 2.0
+              Why Zambian farmers choose ULIMI 2.0
             </p>
           </div>
 
@@ -174,7 +174,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowRegister }
             <span className="block">Ready to transform your farming?</span>
           </h2>
           <p className="mt-4 text-lg leading-6 text-green-200">
-            Join thousands of farmers who are already using ULIMI 2.0 to increase their yields and profits.
+            Join thousands of Zambian farmers who are already using ULIMI 2.0 to increase their yields and profits.
           </p>
           <button
             onClick={onShowRegister}
@@ -196,7 +196,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onShowLogin, onShowRegister }
             <p className="text-white text-lg font-semibold">ULIMI 2.0</p>
           </div>
           <p className="mt-4 text-center text-gray-400">
-            © 2024 ULIMI 2.0. Empowering farmers across Africa with smart agricultural solutions.
+            © 2024 ULIMI 2.0. Empowering farmers across Zambia with smart agricultural solutions.
           </p>
         </div>
       </footer>
