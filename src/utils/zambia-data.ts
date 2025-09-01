@@ -459,12 +459,28 @@ export const formatCurrency = (amount: number, language: string = 'en'): string 
 };
 
 export const formatDate = (date: string, language: string = 'en'): string => {
-  const locale = getLocaleCode(language);
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }).format(new Date(date));
+  // Handle invalid or undefined dates
+  if (!date) {
+    return 'N/A';
+  }
+  
+  try {
+    const dateObj = new Date(date);
+    // Check if the date is valid
+    if (isNaN(dateObj.getTime())) {
+      return 'N/A';
+    }
+    
+    const locale = getLocaleCode(language);
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(dateObj);
+  } catch (error) {
+    // Return fallback if formatting fails
+    return 'N/A';
+  }
 };
 
 // Language utility functions

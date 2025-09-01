@@ -7,7 +7,6 @@ import RoleBasedDashboard from './components/RoleBasedDashboard';
 import VendorDashboard from './components/VendorDashboard';
 import CustomerDashboard from './components/CustomerDashboard';
 import CommunityForum from './components/CommunityForum';
-import Layout from './components/Layout';
 import FarmManagement from './components/FarmManagement';
 import Marketplace from './components/Marketplace';
 import AIAdvisor from './components/AIAdvisor';
@@ -16,9 +15,13 @@ import AICapabilities from './components/AICapabilities';
 import Weather from './components/Weather';
 import TaskManagement from './components/TaskManagement';
 import Inventory from './components/Inventory';
-import UserProfile from './components/UserProfile';
 import IoTSmartIrrigation from './components/IoTSmartIrrigation';
+import UserProfile from './components/UserProfile';
+import Reports from './components/Reports';
 import AdminDashboard from './components/AdminDashboard';
+import Layout from './components/Layout';
+import CropPlanning from './components/CropPlanning';
+import LivestockManagement from './components/LivestockManagement';
 import { UnauthorizedAccess } from './utils/rbac-components';
 import { PermissionManager } from './utils/rbac';
 
@@ -165,6 +168,8 @@ const AppContent: React.FC = () => {
           return <IoTSmartIrrigation />;
         case 'profile':
           return <UserProfile />;
+        case 'reports':
+          return <Reports />;
         default:
           return <RoleBasedDashboard onPageChange={setCurrentPage} />;
       }
@@ -182,7 +187,8 @@ const AppContent: React.FC = () => {
       'tasks': ['manage_farm_profile'],
       'inventory': ['add_products', 'update_products'],
       'iot-irrigation': ['manage_farm_profile'],
-      'profile': ['update_profile']
+      'profile': ['update_profile'],
+      'reports': ['view_reports']
     };
 
     const requiredPermissions = pagePermissions[currentPage] || [];
@@ -220,6 +226,12 @@ const AppContent: React.FC = () => {
         return <IoTSmartIrrigation />;
       case 'profile':
         return <UserProfile />;
+      case 'reports':
+        return <Reports />;
+      case 'crop-planning':
+        return <CropPlanning />;
+      case 'livestock':
+        return <LivestockManagement />;
       default:
         return <RoleBasedDashboard onPageChange={setCurrentPage} />;
     }

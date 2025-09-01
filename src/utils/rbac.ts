@@ -10,6 +10,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     'view_reports',
     // Farmer permissions (admin should have access to all farmer features)
     'manage_farm_profile',
+    'manage_crops',
+    'manage_livestock',
     'add_products',
     'update_products',
     'receive_soil_advice',
@@ -29,6 +31,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
   ],
   farmer: [
     'manage_farm_profile',
+    'manage_crops',
+    'manage_livestock',
     'add_products',
     'update_products',
     'receive_soil_advice',
@@ -41,6 +45,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     'track_deliveries',
     'rate_products',
     'review_products',
+    // Reports access
+    'view_reports',
     // Universal permissions
     'receive_notifications',
     'update_profile',
@@ -54,6 +60,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     'track_deliveries',
     'rate_products',
     'review_products',
+    // Reports access
+    'view_reports',
     'receive_notifications',
     'update_profile',
     'view_weather'
@@ -66,6 +74,8 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
     'add_products',
     'update_products',
     'browse_marketplace',
+    // Reports access
+    'view_reports',
     'receive_notifications',
     'update_profile',
     'view_weather'
@@ -174,6 +184,8 @@ export class PermissionManager {
       
       // Farmer features
       'farm-management': ['manage_farm_profile'],
+      'crop-planning': ['manage_crops'],
+      'livestock': ['manage_livestock'],
       'product-management': ['add_products', 'update_products'],
       'agricultural-advice': ['receive_soil_advice', 'receive_plant_advice'],
       
@@ -202,7 +214,7 @@ export class PermissionManager {
   static getAccessibleFeatures(user: User | null): string[] {
     const allFeatures = [
       'user-management', 'system-settings', 'analytics', 'reports',
-      'farm-management', 'product-management', 'agricultural-advice',
+      'farm-management', 'crop-planning', 'livestock', 'product-management', 'agricultural-advice',
       'marketplace', 'orders', 'payments', 'order-tracking', 'product-reviews',
       'profile', 'notifications', 'weather'
     ];

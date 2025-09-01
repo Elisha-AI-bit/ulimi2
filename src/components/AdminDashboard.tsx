@@ -33,37 +33,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
     loadAdminData();
   }, []);
 
+  // Load initial data
   const loadAdminData = async () => {
-    setLoading(true);
     try {
-      // Load system statistics
-      const stats = {
-        totalUsers: 156,
-        activeUsers: 89,
-        totalFarms: 45,
-        systemUptime: '99.8%',
-        dataStorage: '2.4 GB',
-        apiCalls: 12450,
-        errorRate: '0.2%',
-        lastBackup: new Date().toISOString()
-      };
-      setSystemStats(stats);
-
+      setLoading(true);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
       // Load user data
       const mockUsers = [
         {
           id: 'admin_001',
-          name: 'Mubita',
-          email: 'admin@ulimi.com',
+          name: 'System Administrator',
+          email: 'admin@company.com',
           role: 'admin',
           status: 'active',
-          lastLogin: new Date().toISOString(),
+          lastLogin: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
           farms: 0
         },
         {
           id: 'farmer_001',
-          name: 'Mirriam',
-          email: 'mirriam@ulimi.com',
+          name: 'John Mwanza',
+          email: 'john.mwanza@farmers.com',
           role: 'farmer',
           status: 'active',
           lastLogin: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
@@ -71,8 +63,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
         },
         {
           id: 'customer_001',
-          name: 'Natasha',
-          email: 'natasha@ulimi.com',
+          name: 'Mary Banda',
+          email: 'mary.banda@customers.com',
           role: 'customer',
           status: 'active',
           lastLogin: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
@@ -81,7 +73,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
         {
           id: 'vendor_001',
           name: 'David Seeds Co.',
-          email: 'david@ulimi.com',
+          email: 'info@davidseeds.com',
           role: 'vendor',
           status: 'active',
           lastLogin: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
@@ -94,8 +86,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
       const mockFarmers = [
         {
           id: 'farmer_001',
-          name: 'Mirriam',
-          email: 'mirriam@ulimi.com',
+          name: 'John Mwanza',
+          email: 'john.mwanza@farmers.com',
           farms: 3,
           totalYield: 1250, // in kg
           avgYieldPerFarm: 417,
@@ -107,8 +99,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
         },
         {
           id: 'farmer_002',
-          name: 'John',
-          email: 'john@ulimi.com',
+          name: 'James',
+          email: 'james@farmers.com',
           farms: 2,
           totalYield: 890, // in kg
           avgYieldPerFarm: 445,
@@ -121,7 +113,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
         {
           id: 'farmer_003',
           name: 'Sarah',
-          email: 'sarah@ulimi.com',
+          email: 'sarah@farmers.com',
           farms: 1,
           totalYield: 650, // in kg
           avgYieldPerFarm: 650,
@@ -134,7 +126,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
         {
           id: 'farmer_004',
           name: 'Michael',
-          email: 'michael@ulimi.com',
+          email: 'michael@farmers.com',
           farms: 4,
           totalYield: 1800, // in kg
           avgYieldPerFarm: 450,
@@ -147,7 +139,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
         {
           id: 'farmer_005',
           name: 'Emma',
-          email: 'emma@ulimi.com',
+          email: 'emma@farmers.com',
           farms: 2,
           totalYield: 420, // in kg
           avgYieldPerFarm: 210,
@@ -167,16 +159,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
           timestamp: new Date().toISOString(),
           level: 'info',
           action: 'User Login',
-          details: 'User Mirriam logged in successfully from mobile device',
-          user: 'mirriam@ulimi.com'
+          details: 'User John Mwanza logged in successfully from mobile device',
+          user: 'john.mwanza@farmers.com'
         },
         {
           id: '2',
           timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
           level: 'info',
           action: 'User Registration',
-          details: 'New user Natasha registered as customer',
-          user: 'natasha@ulimi.com'
+          details: 'New user Mary Banda registered as customer',
+          user: 'mary.banda@customers.com'
         },
         {
           id: '3',
@@ -215,8 +207,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onPageChange, initialTa
           timestamp: new Date(Date.now() - 90 * 60 * 1000).toISOString(),
           level: 'info',
           action: 'User Activity',
-          details: 'Admin Mubita accessed user management panel',
-          user: 'admin@ulimi.com'
+          details: 'Admin System Administrator accessed user management panel',
+          user: 'admin@company.com'
         },
         {
           id: '8',

@@ -621,7 +621,7 @@ export default function Marketplace() {
                     
                     <div className="flex items-center text-sm text-gray-500">
                       <MapPin className="h-4 w-4 mr-1" />
-                      {item.location.district}, {item.location.province}
+                      {item.location?.district || 'N/A'}, {item.location?.province || 'N/A'}
                     </div>
                     
                     <div className="flex items-center justify-between text-sm text-gray-500">
@@ -717,7 +717,7 @@ export default function Marketplace() {
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center text-sm text-gray-500">
                       <MapPin className="h-4 w-4 mr-2" />
-                      {supplier.location.district}, {supplier.location.province}
+                      {supplier.location?.district || 'N/A'}, {supplier.location?.province || 'N/A'}
                     </div>
                     
                     {supplier.rating > 0 && (

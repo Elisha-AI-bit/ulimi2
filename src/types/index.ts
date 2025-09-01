@@ -27,6 +27,8 @@ export type Permission =
   
   // Farmer permissions
   | 'manage_farm_profile'
+  | 'manage_crops'
+  | 'manage_livestock'
   | 'add_products'
   | 'update_products'
   | 'receive_soil_advice'
@@ -194,6 +196,101 @@ export interface Crop {
   inventory: InventoryItem[];
 }
 
+// Livestock Management Interfaces
+export interface Livestock {
+  id: string;
+  farmId: string;
+  name: string;
+  type: 'cattle' | 'goat' | 'sheep' | 'pig' | 'chicken' | 'other';
+  breed: string;
+  quantity: number;
+  age: number; // in months
+  weight: number; // in kg
+  healthStatus: 'healthy' | 'ill' | 'recovering' | 'quarantined';
+  lastVaccinationDate?: string;
+  lastDewormingDate?: string;
+  lastCheckupDate?: string;
+  nextVaccinationDate?: string;
+  nextDewormingDate?: string;
+  feedType: string;
+  dailyFeedAmount: number; // in kg
+  waterSource: string;
+  housingType: string;
+  breedingStatus: 'breeding' | 'pregnant' | 'lactating' | 'dry' | 'not_breeding';
+  expectedCalvingDate?: string;
+  lastCalvingDate?: string;
+  milkProduction?: number; // liters per day
+  dailyActivityLevel: 'high' | 'medium' | 'low';
+  location: {
+    penNumber?: string;
+    pastureArea?: string;
+    coordinates?: [number, number];
+  };
+  notes: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface LivestockHealthRecord {
+  id: string;
+  livestockId: string;
+  date: string;
+  veterinarian: string;
+  diagnosis: string;
+  treatment: string;
+  medication: string;
+  dosage: string;
+  duration: string; // treatment duration
+  cost: number;
+  followUpRequired: boolean;
+  followUpDate?: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface LivestockBreedingRecord {
+  id: string;
+  livestockId: string;
+  breedingDate: string;
+  breedingMethod: 'natural' | 'artificial_insemination';
+  sireId?: string;
+  sireName?: string;
+  expectedDeliveryDate: string;
+  actualDeliveryDate?: string;
+  offspringCount?: number;
+  complications?: string;
+  assistanceRequired: boolean;
+  veterinarian?: string;
+  cost: number;
+  notes: string;
+  createdAt: string;
+}
+
+export interface LivestockFeedRecord {
+  id: string;
+  livestockId: string;
+  date: string;
+  feedType: string;
+  quantity: number; // in kg
+  cost: number;
+  supplier: string;
+  notes: string;
+  createdAt: string;
+}
+
+export interface LivestockProductivityRecord {
+  id: string;
+  livestockId: string;
+  date: string;
+  milkProduction?: number; // liters
+  eggsProduced?: number;
+  weightGain?: number; // kg
+  feedConversionRatio?: number;
+  healthScore?: number; // 1-10
+  notes: string;
+  createdAt: string;
+}
+
 export interface Task {
   id: string;
   farmId: string;
@@ -205,7 +302,7 @@ export interface Task {
   type: 'planting' | 'irrigation' | 'fertilizing' | 'pest_control' | 'harvesting' | 'maintenance' | 'monitoring' | 'marketing' | 'other';
   category: 'routine' | 'seasonal' | 'emergency' | 'maintenance' | 'harvest' | 'planning';
   priority: 'low' | 'medium' | 'high' | 'critical';
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled' | 'overdue';
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled' |overdue';
   dueDate: string;
   startDate?: string;
   completedDate?: string;

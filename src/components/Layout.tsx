@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, Home, Sprout, ShoppingCart, Brain, Cloud, CheckSquare, Package, User, Globe, LogOut, Zap, Cpu, Droplets, MessageSquare, Users, Settings, BarChart3, Database, Shield } from 'lucide-react';
+import { Menu, X, Home, Sprout, ShoppingCart, Brain, Cloud, CheckSquare, Package, User, Globe, LogOut, Zap, Cpu, Droplets, MessageSquare, Users, Settings, BarChart3, Database, Shield, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage, LanguageSwitcher } from '../contexts/LanguageContext';
 import { storage } from '../utils/storage';
@@ -55,6 +55,9 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
         { name: 'Farmer Comparison', icon: Sprout, page: 'farmer-comparison', permission: 'manage_users' },
         { name: 'System Settings', icon: Settings, page: 'system-settings', permission: 'configure_system' },
         { name: 'Analytics & Reports', icon: BarChart3, page: 'analytics', permission: 'view_analytics' },
+        { name: 'Crop Planning', icon: Sprout, page: 'crop-planning', permission: 'manage_users' },
+        { name: 'Livestock Management', icon: Sprout, page: 'livestock', permission: 'manage_users' },
+        { name: 'Reports', icon: FileText, page: 'reports', permission: 'view_reports' },
         { name: 'System Monitoring', icon: Database, page: 'system-monitoring', permission: 'view_reports' },
         { name: 'Security & Access', icon: Shield, page: 'security', permission: 'manage_users' },
         { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
@@ -68,6 +71,8 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
       return [
         { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
         { name: t('farms'), icon: Sprout, page: 'farms', permission: 'manage_farm_profile' },
+        { name: 'Crop Planning', icon: Sprout, page: 'crop-planning', permission: 'manage_crops' },
+        { name: 'Livestock Management', icon: Sprout, page: 'livestock', permission: 'manage_livestock' },
         { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
         { name: t('ai_advisor'), icon: Brain, page: 'ai-advisor', permission: 'receive_soil_advice' },
         { name: 'AI Decision Support', icon: Zap, page: 'ai-decision-support', permission: 'receive_soil_advice' },
@@ -76,6 +81,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
         { name: t('tasks'), icon: CheckSquare, page: 'tasks', permission: 'manage_farm_profile' },
         { name: t('inventory'), icon: Package, page: 'inventory', permission: 'add_products' },
         { name: 'IoT Smart Irrigation', icon: Droplets, page: 'iot-irrigation', permission: 'manage_farm_profile' },
+        { name: 'Reports', icon: FileText, page: 'reports', permission: 'view_reports' },
         { name: 'Community Forum', icon: MessageSquare, page: 'forum', permission: null },
         { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
       ];
@@ -86,6 +92,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
         { name: t('dashboard'), icon: Home, page: 'dashboard', permission: null },
         { name: t('marketplace'), icon: ShoppingCart, page: 'marketplace', permission: 'browse_marketplace' },
         { name: 'My Orders', icon: Package, page: 'orders', permission: 'place_orders' },
+        { name: 'Reports', icon: FileText, page: 'reports', permission: 'view_reports' },
         { name: 'Community Forum', icon: MessageSquare, page: 'forum', permission: null },
         { name: t('weather'), icon: Cloud, page: 'weather', permission: 'view_weather' },
         { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
@@ -99,6 +106,7 @@ export default function Layout({ children, currentPage, onPageChange }: LayoutPr
         { name: 'My Products', icon: Package, page: 'vendor-products', permission: 'manage_products' },
         { name: 'Sales Analytics', icon: BarChart3, page: 'vendor-analytics', permission: 'view_sales_analytics' },
         { name: 'Orders Management', icon: CheckSquare, page: 'vendor-orders', permission: 'manage_orders' },
+        { name: 'Reports', icon: FileText, page: 'reports', permission: 'view_reports' },
         { name: 'Community Forum', icon: MessageSquare, page: 'forum', permission: null },
         { name: t('profile'), icon: User, page: 'profile', permission: 'update_profile' },
       ];

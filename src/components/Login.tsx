@@ -108,18 +108,7 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
   };
 
   const fillDemoCredentials = (userType: 'admin' | 'farmer' | 'customer' | 'vendor') => {
-    const credentials = {
-      admin: { identifier: 'admin@ulimi.com', password: 'Admin@123' },
-      farmer: { identifier: 'mirriam@ulimi.com', password: 'Farmer@123' },
-      customer: { identifier: 'natasha@ulimi.com', password: 'Customer@123' },
-      vendor: { identifier: 'david@ulimi.com', password: 'Vendor@123' }
-    };
-    
-    setLoginForm({
-      identifier: credentials[userType].identifier,
-      password: credentials[userType].password,
-      loginType: 'email'
-    });
+    console.log('Demo credentials feature has been disabled');
   };
 
   return (
@@ -144,7 +133,8 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
           </p>
         </div>
 
-        {/* Demo Credentials */}
+        {/* Demo Credentials - REMOVED */}
+        {/* 
         {!isRegister && (
           <div className="mb-6 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800 mb-3 font-medium">Demo Accounts:</p>
@@ -176,7 +166,8 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
             </div>
             <p className="text-xs text-blue-600 mt-2 text-center">💡 Click to try different roles</p>
           </div>
-        )}
+        )} 
+        */}
 
         {/* Error/Success Messages */}
         {error && (

@@ -7,7 +7,7 @@ import { AuthProvider } from '../contexts/AuthContext'
 export const mockUser = {
   id: 'user1',
   name: 'John Mwanza',
-  email: 'mirriam@ulimi.com',
+  email: 'john.mwanza@ulimi.com',
   role: 'farmer' as const,
   location: {
     province: 'Lusaka',
