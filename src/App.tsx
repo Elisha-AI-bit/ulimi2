@@ -24,7 +24,25 @@ import { PermissionManager } from './utils/rbac';
 
 // Main App Component with Authentication
 const AppContent: React.FC = () => {
-  const { authState } = useAuth();
+  // Add error boundary for useAuth hook
+  let authState;
+  try {
+    const auth = useAuth();
+    authState = auth.authState;
+  } catch (error) {
+    console.error('Auth context error:', error);
+    // Return a fallback UI when auth context is not available
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-xl font-bold mb-4">Authentication Error</div>
+          <p className="text-gray-600">There was an issue with the authentication system.</p>
+          <p className="text-gray-600">Please refresh the page or contact support.</p>
+        </div>
+      </div>
+    );
+  }
+
   const [currentPage, setCurrentPage] = React.useState('dashboard');
   const [showLogin, setShowLogin] = React.useState(false);
   const [showRegister, setShowRegister] = React.useState(false);
@@ -79,15 +97,23 @@ const AppContent: React.FC = () => {
       switch (currentPage) {
         case 'user-management':
           return (
-            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+            <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
               <div className="max-w-7xl mx-auto">
                 <AdminDashboard onPageChange={setCurrentPage} initialTab="users" />
               </div>
             </div>
           );
+        case 'farmer-comparison':
+          return (
+            <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
+              <div className="max-w-7xl mx-auto">
+                <AdminDashboard onPageChange={setCurrentPage} initialTab="farmers" />
+              </div>
+            </div>
+          );
         case 'system-settings':
           return (
-            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+            <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
               <div className="max-w-7xl mx-auto">
                 <AdminDashboard onPageChange={setCurrentPage} initialTab="system" />
               </div>
@@ -95,7 +121,7 @@ const AppContent: React.FC = () => {
           );
         case 'analytics':
           return (
-            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+            <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
               <div className="max-w-7xl mx-auto">
                 <AdminDashboard onPageChange={setCurrentPage} initialTab="analytics" />
               </div>
@@ -103,7 +129,7 @@ const AppContent: React.FC = () => {
           );
         case 'system-monitoring':
           return (
-            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+            <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
               <div className="max-w-7xl mx-auto">
                 <AdminDashboard onPageChange={setCurrentPage} initialTab="system" />
               </div>
@@ -111,7 +137,7 @@ const AppContent: React.FC = () => {
           );
         case 'security':
           return (
-            <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+            <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
               <div className="max-w-7xl mx-auto">
                 <AdminDashboard onPageChange={setCurrentPage} initialTab="system" />
               </div>

@@ -46,6 +46,21 @@ const Login: React.FC<LoginProps> = ({ onShowLanding }) => {
       return;
     }
 
+    // Additional validation for email format
+    if (loginForm.loginType === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(loginForm.identifier)) {
+        setError('Please enter a valid email address');
+        return;
+      }
+    }
+
+    // Additional validation for password strength
+    if (loginForm.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
     const result = await login({ ...loginForm, loginType: 'email' });
     if (result.success) {
       setSuccess(result.message || 'Login successful!');

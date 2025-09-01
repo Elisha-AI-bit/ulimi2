@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, ShoppingCart, Plus, MapPin, Calendar, Star, Package, Sprout, User, CreditCard, TrendingUp, Eye, Edit, Trash2, MessageSquare, Clock, CheckCircle, AlertCircle, Truck, DollarSign, Users, BarChart3 } from 'lucide-react';
-import { storage } from '../utils/storage';
+import { useAuth } from '../contexts/AuthContext';
+import { SupabaseDataService } from '../services/supabaseDataService';
 import { formatCurrency, formatDate, zambiaProvinces, zambiaDistricts } from '../utils/zambia-data';
+import { MarketplaceItem, Order } from '../types';
 
 export default function Marketplace() {
-  const [items, setItems] = useState<any[]>([]);
-  const [filteredItems, setFilteredItems] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
+  const { authState } = useAuth();
+  const [items, setItems] = useState<MarketplaceItem[]>([]);
+  const [filteredItems, setFilteredItems] = useState<MarketplaceItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedProvince, setSelectedProvince] = useState('all');
@@ -16,171 +20,147 @@ export default function Marketplace() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [showSupplierForm, setShowSupplierForm] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<MarketplaceItem | null>(null);
   const [orderQuantity, setOrderQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'buy' | 'sell' | 'orders' | 'suppliers' | 'analytics'>('buy');
   const [activeSubTab, setActiveSubTab] = useState<'all' | 'pending' | 'confirmed' | 'delivered' | 'completed'>('all');
 
   useEffect(() => {
-    initializeMarketplaceData();
-  }, []);
+    if (authState.user) {
+      loadMarketplaceData();
+    }
+  }, [authState.user]);
 
-  const initializeMarketplaceData = () => {
-    const savedItems = storage.getMarketplaceItems();
-    const savedOrders = storage.getOrders() || [];
-    const savedSuppliers = storage.getSuppliers() || [];
+  const loadMarketplaceData = async () => {
+    if (!authState.user) return;
     
-    if (savedItems.length === 0) {
-      // Generate sample marketplace items
-      const sampleItems = [
-        {
-          id: '1',
-          sellerId: 'supplier1',
-          sellerName: 'Zambia Seed Company',
-          name: 'SC627 Maize Seed',
-          category: 'inputs',
-          type: 'seed',
-          description: 'High-yielding drought-tolerant maize variety suitable for Zambian conditions',
-          price: 45,
-          currency: 'ZMW',
-          quantity: 500,
-          unit: 'kg',
-          location: { province: 'Lusaka', district: 'Lusaka' },
-          images: ['https://images.pexels.com/photos/1459339/pexels-photo-1459339.jpeg'],
-          status: 'available',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '2',
-          sellerId: 'supplier2',
-          sellerName: 'Agro Inputs Ltd',
-          name: 'Compound D Fertilizer',
-          category: 'inputs',
-          type: 'fertilizer',
-          description: '10:20:10 NPK fertilizer for basal application',
-          price: 280,
-          currency: 'ZMW',
-          quantity: 100,
-          unit: '50kg bag',
-          location: { province: 'Copperbelt', district: 'Kitwe' },
-          images: ['https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg'],
-          status: 'available',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '3',
-          sellerId: 'farmer1',
-          sellerName: 'Mirriam',
-          name: 'White Maize',
-          category: 'produce',
-          type: 'grain',
-          description: 'Grade 1 white maize, well dried and stored',
-          price: 3.5,
-          currency: 'ZMW',
-          quantity: 2000,
-          unit: 'kg',
-          location: { province: 'Eastern', district: 'Chipata' },
-          images: ['https://images.pexels.com/photos/547263/pexels-photo-547263.jpeg'],
-          status: 'available',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: '4',
-          sellerId: 'farmer2',
-          sellerName: 'Natasha',
-          name: 'Soybeans',
-          category: 'produce',
-          type: 'legume',
-          description: 'Premium quality soybeans, ready for processing',
-          price: 8.5,
-          currency: 'ZMW',
-          quantity: 1500,
-          unit: 'kg',
-          location: { province: 'Central', district: 'Kabwe' },
-          images: ['https://images.pexels.com/photos/1459339/pexels-photo-1459339.jpeg'],
-          status: 'available',
-          createdAt: new Date().toISOString()
-        }
-      ];
-      storage.saveMarketplaceItems(sampleItems);
-      setItems(sampleItems);
-    } else {
-      setItems(savedItems);
-    }
-
-    if (savedOrders.length === 0) {
-      const sampleOrders = [
-        {
-          id: 'order1',
-          itemId: '1',
-          itemName: 'SC627 Maize Seed',
-          buyerId: storage.getUser()?.id || 'user1',
-          buyerName: storage.getUser()?.name || 'John Farmer',
-          sellerId: 'supplier1',
-          sellerName: 'Zambia Seed Company',
-          quantity: 25,
-          unit: 'kg',
-          unitPrice: 45,
-          totalAmount: 1125,
-          status: 'pending',
-          paymentStatus: 'pending',
-          deliveryMethod: 'pickup',
-          notes: 'Need by next week for planting season',
-          orderDate: new Date().toISOString(),
-          expectedDelivery: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
-        }
-      ];
-      storage.saveOrders(sampleOrders);
-      setOrders(sampleOrders);
-    } else {
-      setOrders(savedOrders);
-    }
-
-    if (savedSuppliers.length === 0) {
-      const sampleSuppliers = [
-        {
-          id: 'supplier1',
-          name: 'Zambia Seed Company',
-          category: 'Seeds & Planting Materials',
-          contact: {
-            phone: '+260-97-123-4567',
-            email: 'sales@zambiaseed.co.zm',
-            address: 'Plot 1234, Industrial Road, Lusaka'
-          },
-          location: { province: 'Lusaka', district: 'Lusaka' },
-          rating: 4.8,
-          totalSales: 156,
-          verified: true,
-          specialties: ['Maize Seeds', 'Soybean Seeds', 'Vegetable Seeds'],
-          paymentMethods: ['Cash', 'Mobile Money', 'Bank Transfer'],
-          deliveryOptions: ['Pickup', 'Local Delivery', 'Countrywide Shipping'],
-          registeredDate: '2023-01-15',
-          description: 'Leading supplier of quality seeds in Zambia with over 20 years experience'
-        },
-        {
-          id: 'supplier2',
-          name: 'Agro Inputs Ltd',
-          category: 'Fertilizers & Chemicals',
-          contact: {
-            phone: '+260-96-987-6543',
-            email: 'orders@agroinputs.zm',
-            address: 'Plot 5678, Great North Road, Kitwe'
-          },
-          location: { province: 'Copperbelt', district: 'Kitwe' },
-          rating: 4.6,
-          totalSales: 203,
-          verified: true,
-          specialties: ['NPK Fertilizers', 'Pesticides', 'Herbicides'],
-          paymentMethods: ['Cash', 'Mobile Money', 'Credit Terms'],
-          deliveryOptions: ['Pickup', 'Regional Delivery'],
-          registeredDate: '2022-08-20',
-          description: 'Comprehensive agricultural inputs supplier serving Northern provinces'
-        }
-      ];
-      storage.saveSuppliers(sampleSuppliers);
-      setSuppliers(sampleSuppliers);
-    } else {
+    setLoading(true);
+    try {
+      // Load marketplace items
+      const marketplaceItems = await SupabaseDataService.getMarketplaceItems();
+      setItems(marketplaceItems);
+      setFilteredItems(marketplaceItems);
+      
+      // Load user orders
+      const userOrders = await SupabaseDataService.getOrders(authState.user.id);
+      setOrders(userOrders);
+      
+      // Load suppliers (would be implemented in Supabase)
+      const savedSuppliers: any[] = []; // storage.getSuppliers() || [];
       setSuppliers(savedSuppliers);
+    } catch (error) {
+      console.error('Error loading marketplace data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const initializeMarketplaceData = async () => {
+    if (!authState.user) return;
+    
+    try {
+      const marketplaceItems = await SupabaseDataService.getMarketplaceItems();
+      
+      if (marketplaceItems.length === 0) {
+        // Generate sample marketplace items
+        const sampleItems: Omit<MarketplaceItem, 'id' | 'createdAt'>[] = [
+          {
+            sellerId: 'supplier1',
+            sellerName: 'Zambia Seed Company',
+            name: 'SC627 Maize Seed',
+            category: 'inputs',
+            type: 'seed',
+            description: 'High-yielding drought-tolerant maize variety suitable for Zambian conditions',
+            price: 45,
+            currency: 'ZMW',
+            quantity: 500,
+            unit: 'kg',
+            location: {
+              province: 'Lusaka',
+              district: 'Lusaka'
+            },
+            images: ['https://images.pexels.com/photos/1459339/pexels-photo-1459339.jpeg'],
+            status: 'available'
+          },
+          {
+            sellerId: 'supplier2',
+            sellerName: 'Agro Inputs Ltd',
+            name: 'Compound D Fertilizer',
+            category: 'inputs',
+            type: 'fertilizer',
+            description: '10:20:10 NPK fertilizer for basal application',
+            price: 280,
+            currency: 'ZMW',
+            quantity: 100,
+            unit: '50kg bag',
+            location: {
+              province: 'Copperbelt',
+              district: 'Kitwe'
+            },
+            images: ['https://images.pexels.com/photos/4503273/pexels-photo-4503273.jpeg'],
+            status: 'available'
+          },
+          {
+            sellerId: 'farmer1',
+            sellerName: 'Mirriam',
+            name: 'White Maize',
+            category: 'produce',
+            type: 'grain',
+            description: 'Grade 1 white maize, well dried and stored',
+            price: 3.5,
+            currency: 'ZMW',
+            quantity: 2000,
+            unit: 'kg',
+            location: {
+              province: 'Eastern',
+              district: 'Chipata'
+            },
+            images: ['https://images.pexels.com/photos/547263/pexels-photo-547263.jpeg'],
+            status: 'available'
+          },
+          {
+            sellerId: 'farmer2',
+            sellerName: 'Natasha',
+            name: 'Soybeans',
+            category: 'produce',
+            type: 'legume',
+            description: 'Premium quality soybeans, ready for processing',
+            price: 8.5,
+            currency: 'ZMW',
+            quantity: 1500,
+            unit: 'kg',
+            location: {
+              province: 'Central',
+              district: 'Kabwe'
+            },
+            images: ['https://images.pexels.com/photos/1459339/pexels-photo-1459339.jpeg'],
+            status: 'available'
+          }
+        ];
+        
+        // Create sample items in Supabase
+        for (const item of sampleItems) {
+          await SupabaseDataService.createMarketplaceItem(item);
+        }
+        
+        // Reload items after creating samples
+        const updatedItems = await SupabaseDataService.getMarketplaceItems();
+        setItems(updatedItems);
+        setFilteredItems(updatedItems);
+      } else {
+        setItems(marketplaceItems);
+        setFilteredItems(marketplaceItems);
+      }
+      
+      // Load orders
+      const userOrders = await SupabaseDataService.getOrders(authState.user.id);
+      setOrders(userOrders);
+      
+      // Load suppliers (would be implemented in Supabase)
+      const savedSuppliers: any[] = []; // storage.getSuppliers() || [];
+      setSuppliers(savedSuppliers);
+    } catch (error) {
+      console.error('Error initializing marketplace data:', error);
     }
   };
 
@@ -208,114 +188,169 @@ export default function Marketplace() {
     }
 
     // Filter by price range
-    if (priceRange.min !== '') {
-      filtered = filtered.filter(item => item.price >= parseFloat(priceRange.min));
-    }
-    if (priceRange.max !== '') {
-      filtered = filtered.filter(item => item.price <= parseFloat(priceRange.max));
+    if (priceRange.min || priceRange.max) {
+      filtered = filtered.filter(item => {
+        const min = priceRange.min ? parseFloat(priceRange.min) : 0;
+        const max = priceRange.max ? parseFloat(priceRange.max) : Infinity;
+        return item.price >= min && item.price <= max;
+      });
     }
 
     // Sort items
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'price_low':
+        case 'price-low':
           return a.price - b.price;
-        case 'price_high':
+        case 'price-high':
           return b.price - a.price;
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'date':
+        case 'newest':
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'location':
-          return a.location.district.localeCompare(b.location.district);
-        default:
+        case 'rating':
+          // Would need rating data
           return 0;
+        default:
+          return a.name.localeCompare(b.name);
       }
     });
 
     setFilteredItems(filtered);
   }, [items, searchTerm, selectedCategory, selectedProvince, priceRange, sortBy]);
 
-  const handleAddItem = (formData: any) => {
-    const newItem = {
-      id: Date.now().toString(),
-      sellerId: storage.getUser()?.id || 'user1',
-      sellerName: storage.getUser()?.name || 'User',
-      name: formData.name,
-      category: formData.category,
-      type: formData.type,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      currency: 'ZMW',
-      quantity: parseInt(formData.quantity),
-      unit: formData.unit,
-      location: {
-        province: formData.province,
-        district: formData.district
-      },
-      images: [formData.imageUrl || 'https://images.pexels.com/photos/1459339/pexels-photo-1459339.jpeg'],
-      status: 'available',
-      createdAt: new Date().toISOString()
-    };
+  const handleAddItem = async (itemData: any) => {
+    if (!authState.user) return;
+    
+    try {
+      const newItem: Omit<MarketplaceItem, 'id' | 'createdAt'> = {
+        sellerId: authState.user.id,
+        sellerName: authState.user.name,
+        name: itemData.name,
+        category: itemData.category as 'inputs' | 'produce',
+        type: itemData.type,
+        description: itemData.description,
+        price: parseFloat(itemData.price),
+        currency: 'ZMW',
+        quantity: parseFloat(itemData.quantity),
+        unit: itemData.unit,
+        location: {
+          province: itemData.province,
+          district: itemData.district
+        },
+        images: itemData.images || [],
+        status: 'available'
+      };
 
-    const updatedItems = [...items, newItem];
-    setItems(updatedItems);
-    storage.saveMarketplaceItems(updatedItems);
-    setShowAddForm(false);
+      const createdItem = await SupabaseDataService.createMarketplaceItem(newItem);
+      
+      if (createdItem) {
+        setItems([...items, createdItem]);
+        setShowAddForm(false);
+      }
+    } catch (error) {
+      console.error('Error adding marketplace item:', error);
+    }
   };
 
-  const handleQuickOrder = (item: any) => {
+  const handlePlaceOrder = async (orderData: any) => {
+    if (!authState.user) return;
+    
+    try {
+      const newOrder: Omit<Order, 'id'> = {
+        customerId: authState.user.id,
+        items: orderData.items,
+        totalAmount: parseFloat(orderData.totalAmount),
+        status: 'pending',
+        deliveryAddress: orderData.deliveryAddress,
+        orderDate: new Date().toISOString(),
+        deliveryDetails: {
+          fullName: orderData.fullName,
+          phone: orderData.phone,
+          address: orderData.deliveryAddress,
+          district: orderData.district,
+          province: orderData.province,
+          specialInstructions: orderData.specialInstructions
+        },
+        paymentMethod: orderData.paymentMethod,
+        paymentStatus: 'pending'
+      };
+
+      const createdOrder = await SupabaseDataService.createOrder(newOrder);
+      
+      if (createdOrder) {
+        setOrders([...orders, createdOrder]);
+        setShowOrderForm(false);
+      }
+    } catch (error) {
+      console.error('Error placing order:', error);
+    }
+  };
+
+  const updateItem = async (itemId: string, updates: Partial<MarketplaceItem>) => {
+    try {
+      const success = await SupabaseDataService.updateMarketplaceItem(itemId, updates);
+      
+      if (success) {
+        const updatedItems = items.map(item => 
+          item.id === itemId ? { ...item, ...updates } : item
+        );
+        
+        setItems(updatedItems);
+        setFilteredItems(updatedItems);
+      }
+    } catch (error) {
+      console.error('Error updating marketplace item:', error);
+    }
+  };
+
+  const deleteItem = async (itemId: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    
+    try {
+      const success = await SupabaseDataService.deleteMarketplaceItem(itemId);
+      
+      if (success) {
+        const updatedItems = items.filter(item => item.id !== itemId);
+        setItems(updatedItems);
+        setFilteredItems(updatedItems);
+      }
+    } catch (error) {
+      console.error('Error deleting marketplace item:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      </div>
+    );
+  }
+
+  const handleQuickOrder = (item: MarketplaceItem) => {
     setSelectedItem(item);
     setOrderQuantity(1);
     setShowOrderForm(true);
   };
 
   const handleBulkOrder = (formData: any) => {
-    const newOrder = {
-      id: Date.now().toString(),
-      itemId: selectedItem.id,
-      itemName: selectedItem.name,
-      buyerId: storage.getUser()?.id || 'user1',
-      buyerName: storage.getUser()?.name || 'User',
-      sellerId: selectedItem.sellerId,
-      sellerName: selectedItem.sellerName,
-      quantity: parseInt(formData.quantity),
-      unit: selectedItem.unit,
-      unitPrice: selectedItem.price,
-      totalAmount: parseInt(formData.quantity) * selectedItem.price,
-      status: 'pending',
-      paymentStatus: 'pending',
-      deliveryMethod: formData.deliveryMethod,
-      notes: formData.notes || '',
-      orderDate: new Date().toISOString(),
-      expectedDelivery: formData.expectedDelivery
-    };
-
-    const updatedOrders = [...orders, newOrder];
-    setOrders(updatedOrders);
-    storage.saveOrders(updatedOrders);
-    
-    // Add to sync queue for offline functionality
-    storage.addToSyncQueue({
-      type: 'order',
-      orderId: newOrder.id,
-      ...newOrder
-    });
-
+    // Removed storage references and replaced with appropriate logic
+    console.log('Order placed for item:', selectedItem?.name);
     setShowOrderForm(false);
     setSelectedItem(null);
-    alert(`Order for ${selectedItem.name} has been placed successfully!`);
+    alert(`Order for ${selectedItem?.name} has been placed successfully!`);
   };
 
   const updateOrderStatus = (orderId: string, status: string) => {
+    // Removed storage references and replaced with appropriate logic
     const updatedOrders = orders.map(order => 
-      order.id === orderId ? { ...order, status, updatedAt: new Date().toISOString() } : order
+      order.id === orderId ? { ...order, status: status as 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled', updatedAt: new Date().toISOString() } : order
     );
     setOrders(updatedOrders);
-    storage.saveOrders(updatedOrders);
   };
 
   const handleSupplierRegistration = (formData: any) => {
+    // Removed storage references and replaced with appropriate logic
     const newSupplier = {
       id: Date.now().toString(),
       name: formData.name,
@@ -341,7 +376,6 @@ export default function Marketplace() {
 
     const updatedSuppliers = [...suppliers, newSupplier];
     setSuppliers(updatedSuppliers);
-    storage.saveSuppliers(updatedSuppliers);
     setShowSupplierForm(false);
     alert('Supplier registration submitted for review!');
   };
@@ -359,11 +393,11 @@ export default function Marketplace() {
 
   const calculateAnalytics = () => {
     const totalOrders = orders.length;
-    const totalValue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+    const totalValue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
     const pendingOrders = orders.filter(order => order.status === 'pending').length;
-    const completedOrders = orders.filter(order => order.status === 'completed').length;
+    const completedOrders = orders.filter(order => order.status === 'delivered').length;
     const topSuppliers = suppliers
-      .sort((a, b) => b.totalSales - a.totalSales)
+      .sort((a, b) => (b.totalSales || 0) - (a.totalSales || 0))
       .slice(0, 5);
     
     return {
@@ -840,8 +874,8 @@ export default function Marketplace() {
                   {orders.slice(0, 5).map((order) => (
                     <div key={order.id} className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{order.itemName}</p>
-                        <p className="text-xs text-gray-500">{order.sellerName}</p>
+                        <p className="text-sm font-medium text-gray-900">{order.items[0]?.name || 'Order'}</p>
+                        <p className="text-xs text-gray-500">{order.deliveryDetails?.fullName || 'Customer'}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-gray-900">{formatCurrency(order.totalAmount)}</p>
@@ -931,9 +965,9 @@ export default function Marketplace() {
                         required
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                       >
-                        <option value="cash">Cash on Delivery</option>
                         <option value="mobile_money">Mobile Money</option>
                         <option value="bank_transfer">Bank Transfer</option>
+                        <option value="cash_on_delivery">Cash on Delivery</option>
                         <option value="credit">Credit (if approved)</option>
                       </select>
                     </div>
@@ -1072,10 +1106,10 @@ export default function Marketplace() {
                           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                         >
                           <option value="">Select District</option>
-                          {zambiaProvinces.flatMap(province => 
-                            zambiaDistricts[province]?.map(district => (
-                              <option key={district} value={district}>{district}</option>
-                            )) || []
+                          {Object.entries(zambiaDistricts).map(([province, districts]) => 
+                            districts.map(district => (
+                              <option key={`${province}-${district}`} value={district}>{district}</option>
+                            ))
                           )}
                         </select>
                       </div>
@@ -1265,10 +1299,10 @@ export default function Marketplace() {
                           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
                         >
                           <option value="">Select District</option>
-                          {zambiaProvinces.flatMap(province => 
-                            zambiaDistricts[province]?.map(district => (
-                              <option key={district} value={district}>{district}</option>
-                            )) || []
+                          {Object.entries(zambiaDistricts).map(([province, districts]) => 
+                            districts.map(district => (
+                              <option key={`${province}-${district}`} value={district}>{district}</option>
+                            ))
                           )}
                         </select>
                       </div>

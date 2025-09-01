@@ -342,7 +342,7 @@ export default function UserProfile() {
                         >
                           <option value="">Select District</option>
                           {formData.location?.province && zambiaDistricts[formData.location.province]?.map(district => (
-                            <option key={district} value={district}>{district}</option>
+                            <option key={`${formData.location?.province}-${district}`} value={district}>{district}</option>
                           ))}
                         </select>
                       ) : (

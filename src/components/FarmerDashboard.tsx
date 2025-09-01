@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { storage } from '../utils/storage';
 import { formatDate } from '../utils/zambia-data';
+import { Task } from '../types';
 
 interface FarmerDashboardProps {
   onPageChange: (page: string) => void;
@@ -27,16 +28,28 @@ const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onPageChange }) => {
   }, []);
 
   const loadFarmerData = async () => {
-    setLoading(true);
     try {
+      if (!authState.user) {
+        console.warn('No authenticated user found');
+        return;
+      }
+
       // Load farmer-specific data from storage
-      const farmsData = storage.getFarms();
-      const tasksData = storage.getTasks();
-      const weatherData = storage.getWeatherData();
-      const recommendationsData = storage.getAIRecommendations();
+      const farmsData = await storage.getFarms(authState.user.id) || [];
+      
+      // Fetch tasks for all farms
+      let allTasks: Task[] = [];
+      for (const farm of farmsData) {
+        const farmTasks = await storage.getTasks(farm.id) || [];
+        allTasks = [...allTasks, ...farmTasks];
+      }
+      
+      const weatherData = authState.user.location ? 
+        await storage.getWeatherData(authState.user.location) : null;
+      const recommendationsData = await storage.getAIRecommendations(authState.user.id) || [];
       
       setFarms(farmsData);
-      setTasks(tasksData);
+      setTasks(allTasks);
       setRecommendations(recommendationsData);
       
       // Extract crops from farms
@@ -44,8 +57,27 @@ const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onPageChange }) => {
       setCrops(allCrops);
       
       // Set weather data or generate mock data
-      if (weatherData && weatherData.current) {
-        setWeather(weatherData);
+      if (weatherData) {
+        // Convert the WeatherData structure to what the component expects
+        const formattedWeather = {
+          current: {
+            temperature: Math.round((weatherData.temperature.min + weatherData.temperature.max) / 2),
+            humidity: weatherData.humidity,
+            rainfall: weatherData.rainfall,
+            conditions: weatherData.conditions,
+            windSpeed: weatherData.windSpeed,
+            // These are mock values since they're not in the WeatherData interface
+            uvIndex: 6,
+            pressure: 1015,
+            visibility: 15
+          },
+          forecast: [
+            { date: new Date().toISOString(), temp: Math.round((weatherData.temperature.min + weatherData.temperature.max) / 2), rainfall: weatherData.rainfall, conditions: weatherData.conditions },
+            { date: new Date(Date.now() + 86400000).toISOString(), temp: weatherData.temperature.max, rainfall: weatherData.rainfall * 0.8, conditions: weatherData.conditions },
+            { date: new Date(Date.now() + 172800000).toISOString(), temp: weatherData.temperature.min, rainfall: weatherData.rainfall * 1.2, conditions: 'Light Rain' }
+          ]
+        };
+        setWeather(formattedWeather);
       } else {
         const mockWeather = {
           current: {
@@ -64,7 +96,6 @@ const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onPageChange }) => {
             { date: new Date(Date.now() + 172800000).toISOString(), temp: 24, rainfall: 8, conditions: 'Light Rain' }
           ]
         };
-        storage.saveWeatherData(mockWeather);
         setWeather(mockWeather);
       }
       
@@ -102,7 +133,6 @@ const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onPageChange }) => {
             createdAt: new Date().toISOString()
           }
         ];
-        storage.saveAIRecommendations(mockRecommendations);
         setRecommendations(mockRecommendations);
       }
       
@@ -119,21 +149,21 @@ const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onPageChange }) => {
       value: farms.length,
       icon: Sprout,
       color: 'text-green-600 bg-green-100',
-      change: `${farms.reduce((sum, farm) => sum + (farm.size || 0), 0)} hectares total`
+      change: `${Array.isArray(farms) ? farms.reduce((sum, farm) => sum + (farm.size || 0), 0) : 0} hectares total`
     },
     {
       name: 'Active Crops',
       value: crops.length,
       icon: Package,
       color: 'text-blue-600 bg-blue-100',
-      change: `${crops.filter(c => c.status === 'growing').length} growing`
+      change: `${Array.isArray(crops) ? crops.filter(c => c.status === 'growing').length : 0} growing`
     },
     {
       name: 'Pending Tasks',
-      value: tasks.filter(task => task.status === 'pending').length,
+      value: Array.isArray(tasks) ? tasks.filter(task => task.status === 'pending').length : 0,
       icon: Calendar,
       color: 'text-orange-600 bg-orange-100',
-      change: `${tasks.filter(t => t.status === 'overdue').length} overdue`
+      change: `${Array.isArray(tasks) ? tasks.filter(t => t.status === 'overdue').length : 0} overdue`
     },
     {
       name: 'Temperature',

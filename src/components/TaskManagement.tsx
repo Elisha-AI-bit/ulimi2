@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, CheckSquare, Clock, AlertTriangle, Filter, Search, Edit, Trash2, Users, MapPin, Repeat, Star } from 'lucide-react';
-import { storage } from '../utils/storage';
+import { useAuth } from '../contexts/AuthContext';
+import { SupabaseDataService } from '../services/supabaseDataService';
 import { formatDate } from '../utils/zambia-data';
 import { Task, TaskTemplate, TaskSchedule, TeamMember } from '../types';
-import { offlineSyncService } from '../services/OfflineSyncService';
 
 export default function TaskManagement() {
+  const { authState } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [taskTemplates, setTaskTemplates] = useState<TaskTemplate[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'tasks' | 'schedule' | 'templates' | 'team'>('tasks');
   const [showAddForm, setShowAddForm] = useState(false);
   const [showTemplateForm, setShowTemplateForm] = useState(false);
@@ -24,12 +26,31 @@ export default function TaskManagement() {
   const [viewMode, setViewMode] = useState<'list' | 'calendar' | 'kanban'>('list');
 
   useEffect(() => {
-    initializeSampleData();
-  }, []);
+    if (authState.user) {
+      loadTasks();
+    }
+  }, [authState.user]);
 
-  const initializeSampleData = () => {
-    const savedTasks = storage.getTasks();
-    if (savedTasks.length === 0) {
+  const loadTasks = async () => {
+    if (!authState.user) return;
+    
+    setLoading(true);
+    try {
+      // Load tasks from Supabase
+      const userTasks = await SupabaseDataService.getTasks(authState.user.id);
+      setTasks(userTasks);
+      setFilteredTasks(userTasks);
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const initializeSampleData = async () => {
+    // This would be updated to use Supabase in a real implementation
+    const userTasks = await SupabaseDataService.getTasks(authState.user?.id || '');
+    if (userTasks.length === 0) {
       // Generate enhanced sample tasks
       const sampleTasks: Task[] = [
         {
@@ -45,7 +66,7 @@ export default function TaskManagement() {
           dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
           estimatedDuration: 4,
           assignedTo: ['Mirriam Banda', 'Peter Phiri'],
-          createdBy: storage.getUser()?.name || 'Farm Manager',
+          createdBy: authState.user?.name || 'Farm Manager',
           dependencies: [],
           resourceRequirements: [
             {
@@ -120,7 +141,7 @@ export default function TaskManagement() {
           dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
           estimatedDuration: 3,
           assignedTo: ['Natasha Mwanza'],
-          createdBy: storage.getUser()?.name || 'Farm Manager',
+          createdBy: authState.user?.name || 'Farm Manager',
           dependencies: [],
           resourceRequirements: [
             {
@@ -187,7 +208,7 @@ export default function TaskManagement() {
           estimatedDuration: 2,
           actualDuration: 1.5,
           assignedTo: ['Peter Phiri'],
-          createdBy: storage.getUser()?.name || 'Farm Manager',
+          createdBy: authState.user?.name || 'Farm Manager',
           dependencies: [],
           resourceRequirements: [
             {
@@ -327,17 +348,15 @@ export default function TaskManagement() {
         }
       ];
 
-      storage.saveTasks(sampleTasks);
-      storage.set('team_members', sampleTeamMembers);
-      storage.set('task_templates', sampleTemplates);
-      
+      // In a real implementation, we would save these to Supabase
       setTasks(sampleTasks);
       setTeamMembers(sampleTeamMembers);
       setTaskTemplates(sampleTemplates);
     } else {
-      setTasks(savedTasks);
-      setTeamMembers(storage.get('team_members') || []);
-      setTaskTemplates(storage.get('task_templates') || []);
+      setTasks(userTasks);
+      // Load other data from Supabase
+      setTeamMembers([]); // await SupabaseDataService.getTeamMembers()
+      setTaskTemplates([]); // await SupabaseDataService.getTaskTemplates()
     }
   };
 
@@ -376,180 +395,189 @@ export default function TaskManagement() {
     setFilteredTasks(filtered);
   }, [tasks, searchTerm, filterStatus, filterPriority, filterAssignee, filterCategory]);
 
-  const saveTasks = (updatedTasks: Task[]) => {
-    setTasks(updatedTasks);
-    storage.saveTasks(updatedTasks);
-  };
-
-  const saveTaskWithSync = (task: Task, operation: 'create' | 'update' | 'delete') => {
-    // Add to offline sync queue
-    offlineSyncService.addToSyncQueue({
-      type: operation,
-      entity: 'task',
-      entityId: task.id,
-      data: task
-    });
-  };
-
-  const handleAddTask = (formData: any, templateId?: string) => {
-    const template = templateId ? taskTemplates.find(t => t.id === templateId) : null;
+  const handleAddTask = async (taskData: any) => {
+    if (!authState.user) return;
     
-    const newTask: Task = {
-      id: Date.now().toString(),
-      farmId: formData.farmId || 'farm1',
-      cropId: formData.cropId || undefined,
-      equipmentId: formData.equipmentId || undefined,
-      fieldId: formData.fieldId || undefined,
-      title: formData.title,
-      description: formData.description,
-      type: formData.type,
-      category: formData.category || 'routine',
-      priority: formData.priority,
-      status: 'pending',
-      dueDate: formData.dueDate,
-      startDate: formData.startDate || undefined,
-      estimatedDuration: parseFloat(formData.estimatedDuration) || 1,
-      assignedTo: formData.assignedTo ? formData.assignedTo.split(',').map((a: string) => a.trim()) : [],
-      createdBy: storage.getUser()?.name || 'User',
-      supervisedBy: formData.supervisedBy || undefined,
-      dependencies: formData.dependencies ? formData.dependencies.split(',').map((d: string) => d.trim()) : [],
-      resourceRequirements: template?.resourceRequirements || [],
-      weatherDependent: formData.weatherDependent === 'true',
-      weatherConditions: [],
-      recurring: formData.recurring === 'true',
-      recurrencePattern: formData.recurring === 'true' ? {
-        type: formData.recurrenceType || 'weekly',
-        interval: parseInt(formData.recurrenceInterval) || 1
-      } : undefined,
-      cost: {
-        estimated: parseFloat(formData.estimatedCost) || 0,
-        currency: 'ZMW'
-      },
-      location: {
-        fieldName: formData.fieldName || undefined,
-        area: formData.area || undefined
-      },
-      attachments: [],
-      notes: formData.notes || '',
-      qualityChecks: template?.qualityChecks.map(qc => ({
-        id: Date.now().toString() + Math.random(),
-        ...qc,
-        completed: false
-      })) || [],
-      safetyRequirements: template?.safetyRequirements || [],
-      completionCriteria: template?.completionCriteria || [],
-      progressUpdates: [],
-      relatedTasks: [],
-      createdAt: new Date().toISOString()
-    };
+    try {
+      const newTask: Omit<Task, 'id' | 'createdAt' | 'updatedAt'> = {
+        farmId: taskData.farmId,
+        title: taskData.title,
+        description: taskData.description,
+        type: taskData.type,
+        category: taskData.category,
+        priority: taskData.priority,
+        status: 'pending',
+        dueDate: taskData.dueDate,
+        estimatedDuration: parseFloat(taskData.estimatedDuration),
+        assignedTo: taskData.assignedTo ? [taskData.assignedTo] : [],
+        createdBy: authState.user.name,
+        dependencies: [],
+        resourceRequirements: [],
+        weatherDependent: false,
+        recurring: false,
+        cost: {
+          estimated: 0,
+          currency: 'ZMW'
+        },
+        location: {
+          fieldName: '',
+          area: ''
+        },
+        attachments: [],
+        notes: '',
+        qualityChecks: [],
+        safetyRequirements: [],
+        completionCriteria: [],
+        progressUpdates: [],
+        relatedTasks: []
+      };
 
-    const updatedTasks = [...tasks, newTask];
-    saveTasks(updatedTasks);
-    saveTaskWithSync(newTask, 'create');
-    setShowAddForm(false);
-    setSelectedTemplate(null);
-  };
-
-  const handleEditTask = (formData: any) => {
-    if (!editingTask) return;
-    
-    const updatedTask = {
-      ...editingTask, 
-      title: formData.title,
-      description: formData.description,
-      dueDate: formData.dueDate,
-      priority: formData.priority,
-      assignedTo: formData.assignedTo ? formData.assignedTo.split(',').map((a: string) => a.trim()) : editingTask.assignedTo,
-      notes: formData.notes || editingTask.notes,
-      updatedAt: new Date().toISOString()
-    };
-    
-    const updatedTasks = tasks.map(task =>
-      task.id === editingTask.id ? updatedTask : task
-    );
-    saveTasks(updatedTasks);
-    saveTaskWithSync(updatedTask, 'update');
-    setEditingTask(null);
-  };
-
-  const updateTaskStatus = (taskId: string, newStatus: Task['status']) => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id === taskId) {
-        const updates: Partial<Task> = {
-          status: newStatus,
-          updatedAt: new Date().toISOString()
-        };
-        
-        if (newStatus === 'completed') {
-          updates.completedDate = new Date().toISOString();
-        }
-        
-        const updatedTask = { ...task, ...updates };
-        saveTaskWithSync(updatedTask, 'update');
-        return updatedTask;
+      const createdTask = await SupabaseDataService.createTask(newTask);
+      
+      if (createdTask) {
+        setTasks([...tasks, createdTask]);
+        setFilteredTasks([...tasks, createdTask]);
+        setShowAddForm(false);
       }
-      return task;
-    });
-    saveTasks(updatedTasks);
-  };
-
-  const updateTaskProgress = (taskId: string, progressPercentage: number, description: string) => {
-    const updatedTasks = tasks.map(task => {
-      if (task.id === taskId) {
-        const newProgress = {
-          id: Date.now().toString(),
-          timestamp: new Date().toISOString(),
-          progressPercentage,
-          description,
-          updatedBy: storage.getUser()?.name || 'User'
-        };
-        
-        const newStatus: Task['status'] = progressPercentage >= 100 ? 'completed' : progressPercentage > 0 ? 'in_progress' : 'pending';
-        
-        const updatedTask = {
-          ...task,
-          progressUpdates: [...task.progressUpdates, newProgress],
-          status: newStatus,
-          updatedAt: new Date().toISOString()
-        };
-        
-        saveTaskWithSync(updatedTask, 'update');
-        return updatedTask;
-      }
-      return task;
-    });
-    saveTasks(updatedTasks);
-  };
-
-  const deleteTask = (taskId: string) => {
-    if (confirm('Are you sure you want to delete this task?')) {
-      const taskToDelete = tasks.find(task => task.id === taskId);
-      if (taskToDelete) {
-        const updatedTasks = tasks.filter(task => task.id !== taskId);
-        saveTasks(updatedTasks);
-        saveTaskWithSync(taskToDelete, 'delete');
-      }
+    } catch (error) {
+      console.error('Error adding task:', error);
     }
   };
 
-  const duplicateTask = (taskId: string) => {
-    const taskToDuplicate = tasks.find(task => task.id === taskId);
-    if (taskToDuplicate) {
-      const duplicatedTask: Task = {
-        ...taskToDuplicate,
-        id: Date.now().toString(),
-        title: `${taskToDuplicate.title} (Copy)`,
-        status: 'pending',
-        completedDate: undefined,
-        actualDuration: undefined,
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-        progressUpdates: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: undefined
+  const handleEditTask = async (formData: any) => {
+    if (!editingTask) return;
+    
+    try {
+      const updates: Partial<Task> = {
+        title: formData.title,
+        description: formData.description,
+        dueDate: formData.dueDate,
+        priority: formData.priority,
+        assignedTo: formData.assignedTo ? formData.assignedTo.split(',').map((a: string) => a.trim()) : editingTask.assignedTo,
+        notes: formData.notes || editingTask.notes,
+        updatedAt: new Date().toISOString()
       };
       
-      const updatedTasks = [...tasks, duplicatedTask];
-      saveTasks(updatedTasks);
+      const success = await SupabaseDataService.updateTask(editingTask.id, updates);
+      
+      if (success) {
+        const updatedTask = { ...editingTask, ...updates };
+        const updatedTasks = tasks.map(task =>
+          task.id === editingTask.id ? updatedTask : task
+        );
+        setTasks(updatedTasks);
+        setFilteredTasks(updatedTasks);
+        setEditingTask(null);
+      }
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  };
+
+  const updateTaskStatus = async (taskId: string, newStatus: Task['status']) => {
+    try {
+      const updates: Partial<Task> = {
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      };
+      
+      if (newStatus === 'completed') {
+        updates.completedDate = new Date().toISOString();
+      }
+      
+      const success = await SupabaseDataService.updateTask(taskId, updates);
+      
+      if (success) {
+        const updatedTasks = tasks.map(task => {
+          if (task.id === taskId) {
+            const updatedTask = { ...task, ...updates };
+            return updatedTask;
+          }
+          return task;
+        });
+        setTasks(updatedTasks);
+        setFilteredTasks(updatedTasks);
+      }
+    } catch (error) {
+      console.error('Error updating task status:', error);
+    }
+  };
+
+  const updateTaskProgress = async (taskId: string, progressPercentage: number, description: string) => {
+    try {
+      const newProgress = {
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        progressPercentage,
+        description,
+        updatedBy: authState.user?.name || 'User'
+      };
+      
+      const newStatus: Task['status'] = progressPercentage >= 100 ? 'completed' : progressPercentage > 0 ? 'in_progress' : 'pending';
+      
+      const updates: Partial<Task> = {
+        progressUpdates: [...(tasks.find(t => t.id === taskId)?.progressUpdates || []), newProgress],
+        status: newStatus,
+        updatedAt: new Date().toISOString()
+      };
+      
+      const success = await SupabaseDataService.updateTask(taskId, updates);
+      
+      if (success) {
+        const updatedTasks = tasks.map(task => {
+          if (task.id === taskId) {
+            const updatedTask = { ...task, ...updates };
+            return updatedTask;
+          }
+          return task;
+        });
+        setTasks(updatedTasks);
+        setFilteredTasks(updatedTasks);
+      }
+    } catch (error) {
+      console.error('Error updating task progress:', error);
+    }
+  };
+
+  const deleteTask = async (taskId: string) => {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+    
+    try {
+      const success = await SupabaseDataService.deleteTask(taskId);
+      
+      if (success) {
+        const updatedTasks = tasks.filter(task => task.id !== taskId);
+        setTasks(updatedTasks);
+        setFilteredTasks(updatedTasks);
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  };
+
+  const duplicateTask = async (taskId: string) => {
+    const taskToDuplicate = tasks.find(task => task.id === taskId);
+    if (taskToDuplicate) {
+      try {
+        const duplicatedTask: Omit<Task, 'id' | 'createdAt' | 'updatedAt'> = {
+          ...taskToDuplicate,
+          title: `${taskToDuplicate.title} (Copy)`,
+          status: 'pending',
+          completedDate: undefined,
+          actualDuration: undefined,
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+          progressUpdates: [],
+        };
+        
+        const createdTask = await SupabaseDataService.createTask(duplicatedTask);
+        
+        if (createdTask) {
+          setTasks([...tasks, createdTask]);
+          setFilteredTasks([...tasks, createdTask]);
+        }
+      } catch (error) {
+        console.error('Error duplicating task:', error);
+      }
     }
   };
 
@@ -585,7 +613,12 @@ export default function TaskManagement() {
     }
   };
 
-  const farms = storage.getFarms();
+  // Mock data for farms since we're not using storage anymore
+  const farms = [
+    { id: 'farm1', name: 'Main Farm' },
+    { id: 'farm2', name: 'Secondary Farm' }
+  ];
+  
   const taskTypes = [
     { value: 'planting', label: 'Planting' },
     { value: 'irrigation', label: 'Irrigation' },
@@ -594,6 +627,16 @@ export default function TaskManagement() {
     { value: 'harvesting', label: 'Harvesting' },
     { value: 'other', label: 'Other' }
   ];
+
+  if (loading) {
+    return (
+      <div className="px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">
@@ -635,6 +678,7 @@ export default function TaskManagement() {
         >
           <option value="all">All Tasks</option>
           <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
           <option value="completed">Completed</option>
         </select>
 
@@ -781,7 +825,7 @@ export default function TaskManagement() {
                       </div>
                       <span className="hidden sm:inline mx-2">•</span>
                       <div className="flex items-center truncate">
-                        <span className="truncate">Assigned to: {task.assignedTo}</span>
+                        <span className="truncate">Assigned to: {task.assignedTo.join(', ')}</span>
                       </div>
                     </div>
                   </div>
@@ -832,11 +876,10 @@ export default function TaskManagement() {
               <form onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target as HTMLFormElement);
-                const data = Object.fromEntries(formData);
                 if (editingTask) {
-                  handleEditTask(data);
+                  handleEditTask(Object.fromEntries(formData));
                 } else {
-                  handleAddTask(data);
+                  handleAddTask(Object.fromEntries(formData));
                 }
               }}>
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -928,9 +971,9 @@ export default function TaskManagement() {
                       <input
                         type="text"
                         name="assignedTo"
-                        defaultValue={editingTask?.assignedTo || storage.getUser()?.name || ''}
+                        defaultValue={editingTask?.assignedTo.join(', ') || authState.user?.name || ''}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
-                        placeholder="Enter assignee name"
+                        placeholder="Enter assignee name(s), comma separated"
                       />
                     </div>
 

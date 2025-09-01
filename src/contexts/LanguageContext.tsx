@@ -31,14 +31,14 @@ interface LanguageProviderProps {
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
   const [currentLanguage, setCurrentLanguage] = useState<string>(() => {
-    // Initialize with detected or saved language
-    return detectUserLanguage();
+    // Initialize with saved language preference or detected language
+    const savedLanguage = storage.get<string>('language');
+    return savedLanguage || detectUserLanguage();
   });
 
   useEffect(() => {
     // Save language preference when it changes
     storage.set('language', currentLanguage);
-    localStorage.setItem('ulimi_language', currentLanguage);
     
     // Set document language attribute
     document.documentElement.lang = currentLanguage;

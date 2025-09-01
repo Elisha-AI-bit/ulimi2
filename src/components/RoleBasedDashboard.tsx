@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import FarmerDashboard from './FarmerDashboard';
 import AdminDashboard from './AdminDashboard';
 
-const RoleBasedDashboard: React.FC<{ onPageChange: (page: string) => void; initialTab?: 'overview' | 'users' | 'system' | 'analytics' }> = ({ onPageChange, initialTab }) => {
+const RoleBasedDashboard: React.FC<{ onPageChange: (page: string) => void; initialTab?: 'overview' | 'users' | 'farmers' | 'system' | 'analytics' }> = ({ onPageChange, initialTab }) => {
   const { authState } = useAuth();
   
   if (!authState.user) {

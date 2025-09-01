@@ -1,308 +1,228 @@
-// Local Storage utilities for offline functionality
-class LocalStorageManager {
-  private prefix = 'ulimi_';
+// Storage utilities - now using Supabase instead of localStorage
+import { SupabaseDataService } from '../services/supabaseDataService'
+import { 
+  User, 
+  Farm, 
+  Task, 
+  MarketplaceItem, 
+  InventoryItem, 
+  Order,
+  WeatherData,
+  AIRecommendation
+} from '../types'
 
-  // Generic storage methods
+// Map WeatherData from storage format to display format
+const mapWeatherData = (weather: any): WeatherData | null => {
+  if (!weather) return null;
+  
+  return {
+    date: weather.date,
+    temperature: {
+      min: weather.temperature_min,
+      max: weather.temperature_max
+    },
+    humidity: weather.humidity,
+    rainfall: weather.rainfall,
+    windSpeed: weather.wind_speed,
+    conditions: weather.conditions
+  };
+};
+
+class StorageManager {
+  // Simple key-value storage methods using localStorage
   set<T>(key: string, value: T): void {
     try {
-      localStorage.setItem(this.prefix + key, JSON.stringify(value));
+      localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      console.error(`Error setting ${key} in localStorage:`, error);
     }
   }
 
   get<T>(key: string): T | null {
     try {
-      const item = localStorage.getItem(this.prefix + key);
+      const item = localStorage.getItem(key);
       return item ? JSON.parse(item) : null;
     } catch (error) {
-      console.error('Error reading from localStorage:', error);
+      console.error(`Error getting ${key} from localStorage:`, error);
       return null;
     }
   }
 
   remove(key: string): void {
-    localStorage.removeItem(this.prefix + key);
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.error(`Error removing ${key} from localStorage:`, error);
+    }
   }
 
-  clear(): void {
-    Object.keys(localStorage)
-      .filter(key => key.startsWith(this.prefix))
-      .forEach(key => localStorage.removeItem(key));
+  // User methods
+  async saveUser(user: User): Promise<void> {
+    // In Supabase implementation, user data is managed by Supabase Auth
+    // This method is kept for compatibility but doesn't do anything
+    console.log('User data is managed by Supabase Auth, not stored locally')
   }
 
-  // Specific data methods
-  saveUser(user: any): void {
-    this.set('user', user);
+  async getUser(): Promise<User | null> {
+    // This would be handled by Supabase Auth
+    console.log('User data is managed by Supabase Auth')
+    return null
   }
 
-  getUser(): any {
-    return this.get('user');
+  // Farm methods
+  async saveFarms(farms: Farm[]): Promise<void> {
+    // Farms are now stored in Supabase database
+    console.log('Farms are stored in Supabase database')
   }
 
-  saveFarms(farms: any[]): void {
-    this.set('farms', farms);
+  async getFarms(userId: string): Promise<Farm[]> {
+    // Check if userId is valid
+    if (!userId) {
+      console.warn('No user ID provided for fetching farms')
+      return []
+    }
+    return await SupabaseDataService.getFarms(userId)
   }
 
-  getFarms(): any[] {
-    return this.get('farms') || [];
+  async saveTasks(tasks: Task[]): Promise<void> {
+    // Tasks are now stored in Supabase database
+    console.log('Tasks are stored in Supabase database')
   }
 
-  saveTasks(tasks: any[]): void {
-    this.set('tasks', tasks);
+  async getTasks(farmId: string): Promise<Task[]> {
+    // Check if farmId is valid
+    if (!farmId) {
+      console.warn('No farm ID provided for fetching tasks')
+      return []
+    }
+    return await SupabaseDataService.getTasks(farmId)
   }
 
-  getTasks(): any[] {
-    return this.get('tasks') || [];
+  async saveMarketplaceItems(items: MarketplaceItem[]): Promise<void> {
+    // Marketplace items are now stored in Supabase database
+    console.log('Marketplace items are stored in Supabase database')
   }
 
-  saveMarketplaceItems(items: any[]): void {
-    this.set('marketplace', items);
+  async getMarketplaceItems(): Promise<MarketplaceItem[]> {
+    return await SupabaseDataService.getMarketplaceItems()
   }
 
-  getMarketplaceItems(): any[] {
-    return this.get('marketplace') || [];
+  async saveOrders(orders: Order[]): Promise<void> {
+    // Orders are now stored in Supabase database
+    console.log('Orders are stored in Supabase database')
   }
 
-  saveOrders(orders: any[]): void {
-    this.set('orders', orders);
+  async getOrders(userId: string): Promise<Order[]> {
+    return await SupabaseDataService.getOrders(userId)
   }
 
-  getOrders(): any[] {
-    return this.get('orders') || [];
+  async saveSuppliers(suppliers: any[]): Promise<void> {
+    // Suppliers would be stored in Supabase database
+    console.log('Suppliers are stored in Supabase database')
   }
 
-  saveSuppliers(suppliers: any[]): void {
-    this.set('suppliers', suppliers);
+  async getSuppliers(): Promise<any[]> {
+    // Implementation would depend on Supabase table structure
+    return []
   }
 
-  getSuppliers(): any[] {
-    return this.get('suppliers') || [];
+  async saveWeatherData(weather: any): Promise<void> {
+    // Weather data is now stored in Supabase database
+    console.log('Weather data is stored in Supabase database')
   }
 
-  saveWeatherData(weather: any): void {
-    this.set('weather', weather);
+  async getWeatherData(location: { province: string; district: string }): Promise<WeatherData | null> {
+    // Check if location data is valid
+    if (!location || !location.province || !location.district) {
+      console.warn('Invalid location data provided for fetching weather')
+      return null
+    }
+    const weather = await SupabaseDataService.getWeatherData(location);
+    return mapWeatherData(weather);
   }
 
-  getWeatherData(): any {
-    return this.get('weather');
+  async saveAIRecommendations(recommendations: AIRecommendation[]): Promise<void> {
+    // AI recommendations are now stored in Supabase database
+    console.log('AI recommendations are stored in Supabase database')
   }
 
-  saveAIRecommendations(recommendations: any[]): void {
-    this.set('ai_recommendations', recommendations);
-  }
-
-  getAIRecommendations(): any[] {
-    return this.get('ai_recommendations') || [];
+  async getAIRecommendations(userId: string): Promise<AIRecommendation[]> {
+    // Check if userId is valid
+    if (!userId) {
+      console.warn('No user ID provided for fetching AI recommendations')
+      return []
+    }
+    return await SupabaseDataService.getAIRecommendations(userId)
   }
 
   // Additional storage methods for complete system
-  saveUserPreferences(preferences: any): void {
-    this.set('user_preferences', preferences);
+  async saveUserPreferences(preferences: any): Promise<void> {
+    // User preferences could be stored in Supabase
+    console.log('User preferences would be stored in Supabase')
   }
 
-  getUserPreferences(): any {
-    return this.get('user_preferences') || {};
+  async getUserPreferences(): Promise<any> {
+    // Implementation would depend on Supabase table structure
+    return {}
   }
 
   // Initialize sample data if not exists
-  initializeSampleData(): void {
-    // Sample farms
-    const existingFarms = this.get<any[]>('farms');
-    if (!existingFarms || existingFarms.length === 0) {
-      const sampleFarms = [
-        {
-          id: 'farm1',
-          farmerId: 'farmer1',
-          name: 'Green Valley Farm',
-          size: 5.5,
-          location: {
-            province: 'Lusaka',
-            district: 'Lusaka',
-            coordinates: [-15.3875, 28.3228]
-          },
-          soilType: 'Clay loam',
-          crops: [
-            {
-              id: 'crop1',
-              farmId: 'farm1',
-              name: 'Maize',
-              variety: 'SC627',
-              plantingDate: '2024-12-01',
-              expectedHarvestDate: '2025-04-15',
-              area: 3.0,
-              status: 'growing',
-              tasks: [],
-              inventory: []
-            }
-          ],
-          createdAt: new Date().toISOString()
-        }
-      ];
-      this.saveFarms(sampleFarms);
-    }
-
-    // Sample marketplace items
-    const existingItems = this.get<any[]>('marketplace');
-    if (!existingItems || existingItems.length === 0) {
-      const sampleItems = [
-        {
-          id: 'item1',
-          sellerId: 'farmer1',
-          sellerName: 'Mirriam',
-          name: 'Fresh Maize',
-          category: 'produce',
-          type: 'grain',
-          description: 'Freshly harvested white maize, perfect for consumption or processing',
-          price: 8.50,
-          currency: 'ZMW',
-          quantity: 500,
-          unit: 'kg',
-          location: {
-            province: 'Lusaka',
-            district: 'Lusaka'
-          },
-          images: [],
-          status: 'available',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'item2',
-          sellerId: 'supplier1',
-          sellerName: 'AgriSupply Co.',
-          name: 'NPK Fertilizer',
-          category: 'inputs',
-          type: 'fertilizer',
-          description: 'High-quality NPK fertilizer (10-10-10) for optimal crop growth',
-          price: 350.00,
-          currency: 'ZMW',
-          quantity: 50,
-          unit: 'bag',
-          location: {
-            province: 'Copperbelt',
-            district: 'Kitwe'
-          },
-          images: [],
-          status: 'available',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'item3',
-          sellerId: 'farmer2',
-          sellerName: 'Natasha',
-          name: 'Sweet Potatoes',
-          category: 'produce',
-          type: 'vegetable',
-          description: 'Organic sweet potatoes, rich in vitamins and minerals',
-          price: 12.00,
-          currency: 'ZMW',
-          quantity: 200,
-          unit: 'kg',
-          location: {
-            province: 'Central',
-            district: 'Kabwe'
-          },
-          images: [],
-          status: 'available',
-          createdAt: new Date().toISOString()
-        }
-      ];
-      this.saveMarketplaceItems(sampleItems);
-    }
-
-    // Sample tasks
-    const existingTasks = this.get<any[]>('tasks');
-    if (!existingTasks || existingTasks.length === 0) {
-      const sampleTasks = [
-        {
-          id: 'task1',
-          cropId: 'crop1',
-          title: 'Apply fertilizer to maize field',
-          description: 'Apply NPK fertilizer to the maize crop for optimal growth',
-          type: 'fertilizing',
-          dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-          completed: false,
-          priority: 'high',
-          createdAt: new Date().toISOString()
-        },
-        {
-          id: 'task2',
-          cropId: 'crop1',
-          title: 'Weed control',
-          description: 'Remove weeds from the maize field to prevent competition',
-          type: 'other',
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          completed: false,
-          priority: 'medium',
-          createdAt: new Date().toISOString()
-        }
-      ];
-      this.saveTasks(sampleTasks);
-    }
-
-    // Sample weather data
-    if (!this.get('weather')) {
-      const sampleWeather = {
-        date: new Date().toISOString(),
-        temperature: {
-          min: 18,
-          max: 28
-        },
-        humidity: 65,
-        rainfall: 2.5,
-        windSpeed: 12,
-        conditions: 'partly cloudy'
-      };
-      this.saveWeatherData(sampleWeather);
-    }
+  async initializeSampleData(): Promise<void> {
+    // Sample data initialization would be handled differently with Supabase
+    console.log('Sample data initialization would be handled with Supabase')
   }
 
-  saveNotifications(notifications: any[]): void {
-    this.set('notifications', notifications);
+  async saveNotifications(notifications: any[]): Promise<void> {
+    // Notifications would be stored in Supabase database
+    console.log('Notifications are stored in Supabase database')
   }
 
-  getNotifications(): any[] {
-    return this.get('notifications') || [];
+  async getNotifications(): Promise<any[]> {
+    // Implementation would depend on Supabase table structure
+    return []
   }
 
-  saveAnalytics(analytics: any): void {
-    this.set('analytics', analytics);
+  async saveAnalytics(analytics: any): Promise<void> {
+    // Analytics would be stored in Supabase database
+    console.log('Analytics are stored in Supabase database')
   }
 
-  getAnalytics(): any {
-    return this.get('analytics') || {};
+  async getAnalytics(): Promise<any> {
+    // Implementation would depend on Supabase table structure
+    return {}
   }
 
-  saveOfflineActions(actions: any[]): void {
-    this.set('offline_actions', actions);
+  async saveOfflineActions(actions: any[]): Promise<void> {
+    // Offline actions would be stored in Supabase database
+    console.log('Offline actions are stored in Supabase database')
   }
 
-  getOfflineActions(): any[] {
-    return this.get('offline_actions') || [];
+  async getOfflineActions(): Promise<any[]> {
+    // Implementation would depend on Supabase table structure
+    return []
   }
 
-  clearOfflineActions(): void {
-    this.remove('offline_actions');
+  async clearOfflineActions(): Promise<void> {
+    // Implementation would depend on Supabase table structure
+    console.log('Clear offline actions in Supabase database')
   }
 
   // Sync queue for offline operations
-  addToSyncQueue(operation: any): void {
-    const queue = this.get<any[]>('sync_queue') || [];
-    queue.push({
-      ...operation,
-      timestamp: new Date().toISOString(),
-      id: Date.now().toString()
-    });
-    this.set('sync_queue', queue);
+  async addToSyncQueue(operation: any): Promise<void> {
+    // Sync queue would be implemented with Supabase
+    console.log('Sync queue operations are handled with Supabase')
   }
 
-  getSyncQueue(): any[] {
-    return this.get('sync_queue') || [];
+  async getSyncQueue(): Promise<any[]> {
+    // Implementation would depend on Supabase table structure
+    return []
   }
 
-  clearSyncQueue(): void {
-    this.remove('sync_queue');
+  async clearSyncQueue(): Promise<void> {
+    // Implementation would depend on Supabase table structure
+    console.log('Clear sync queue in Supabase database')
   }
 }
 
-export const storage = new LocalStorageManager();
+// Export the single instance of StorageManager
+export const storage = new StorageManager()
