@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "type": "crop_plan",
+    "title": "Maize Planting Recommendation",
+    "description": "Based on your location and soil conditions, we recommend planting maize variety SC627 with a spacing of 75cm between rows and 25cm between plants.",
+    "confidence": 85,
+    "createdAt": "2024-01-15T10:30:00Z"
+  },
+  {
+    "id": "2",
+    "type": "input_recommendation",
+    "title": "Fertilizer Application",
+    "description": "Apply 200kg/ha of Compound D fertilizer at planting and top-dress with 100kg/ha of Urea 4-6 weeks after planting.",
+    "confidence": 92,
+    "createdAt": "2024-01-14T14:20:00Z"
+  },
+  {
+    "id": "3",
+    "type": "pest_disease",
+    "title": "Fall Armyworm Alert",
+    "description": "Increased risk of Fall Armyworm infestation detected in your area. Monitor fields twice daily and apply appropriate treatment if threshold is reached.",
+    "confidence": 78,
+    "createdAt": "2024-01-13T09:15:00Z"
+  }
+]

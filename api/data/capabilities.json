@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Crop Planning",
+    "description": "Get optimal crop rotation and planting schedules"
+  },
+  {
+    "name": "Pest & Disease ID",
+    "description": "Upload photos for instant pest identification"
+  },
+  {
+    "name": "Weather Insights",
+    "description": "Receive weather-based farming recommendations"
+  },
+  {
+    "name": "Market Predictions",
+    "description": "Get price forecasts and market trends"
+  },
+  {
+    "name": "Input Recommendations",
+    "description": "Receive personalized fertilizer and pesticide recommendations"
+  },
+  {
+    "name": "Yield Forecasting",
+    "description": "Predict crop yields based on current conditions"
+  }
+]
