@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom responsive utilities for better mobile experience */
+@layer utilities {
+  .text-xxs {
+    font-size: 0.65rem;
+    line-height: 1rem;
+  }
+  
+  .min-h-touch {
+    min-height: 44px;
+  }
+  
+  .min-w-touch {
+    min-width: 44px;
+  }
+  
+  /* Prevent auto-zoom on iOS Safari */
+  input, textarea, select {
+    font-size: 16px;
+  }
+  
+  @media screen and (min-width: 768px) {
+    input, textarea, select {
+      font-size: 1rem;
+    }
+  }
+  
+  /* Ensure proper scrolling on mobile */
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}

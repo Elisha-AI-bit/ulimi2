@@ -1,126 +1,117 @@
-# Ulimi Smart Farming System
+# ULIMI 2.0 - Farming Management System with Supabase Integration
 
-A comprehensive smart farming management and advisory system that leverages AI to provide farmers with data-driven insights for crop management, livestock monitoring, pest and disease detection, marketplace integration, and performance reporting.
+## Overview
+ULIMI 2.0 is a comprehensive farming management system designed to revolutionize agricultural practices through technology. This version has been enhanced with Supabase integration for robust backend services including authentication, database management, and real-time features.
 
 ## Features
-
-- AI-driven crop recommendations and irrigation schedules
-- Livestock health and behavior monitoring
-- Pest and disease detection using image recognition
-- Marketplace for farmers to sell produce
-- Performance reports and comparative analytics
-- Support for multiple user roles with tailored interfaces
+- **User Authentication**: Secure registration and login using Supabase Auth
+- **Farm Management**: Create and manage multiple farm profiles
+- **Task Management**: Track agricultural tasks and activities
+- **Marketplace**: Buy and sell agricultural products
+- **AI Agricultural Advisor**: Soil analysis and plant disease identification
+- **IoT Smart Irrigation**: Monitor and control irrigation systems
+- **Community Forum**: Connect with other farmers and experts
+- **Weather Integration**: Real-time weather information and forecasts
 
 ## Technology Stack
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React Context API
+- **Backend**: Supabase (Auth, Database, Storage)
+- **Build Tool**: Vite
+- **Testing**: Vitest
 
-- **Frontend**: React.js with Material-UI
-- **Backend**: Supabase (PostgreSQL with built-in authentication and real-time capabilities)
-- **AI/ML**: Custom JavaScript implementations simulating TensorFlow.js functionality
-- **IoT Simulation**: Node.js services with mock data generation
+## Prerequisites
+- Node.js (version 16 or higher)
+- npm or yarn package manager
+- Supabase account (free tier available)
+
+## Setup Instructions
+
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd ulimi
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+
+### 3. Configure Supabase
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+2. Copy your project URL and anon key
+3. Create a `.env` file in the project root:
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 4. Set Up Database
+1. Run the schema script `SUPABASE_SCHEMA.sql` in your Supabase SQL editor
+2. Configure Row Level Security (RLS) policies as needed
+
+### 5. Start the Development Server
+```bash
+npm run dev
+```
+
+### 6. Build for Production
+```bash
+npm run build
+```
+
+## Supabase Integration Details
+
+### Authentication
+The system uses Supabase Auth for user management:
+- Email/password authentication
+- User session persistence
+- Profile management
+- Role-based access control
+
+### Database
+Supabase PostgreSQL database stores all application data:
+- Users and profiles
+- Farms and crops
+- Tasks and activities
+- Marketplace items and orders
+- Inventory management
+- Weather data
+- AI recommendations
+
+### Security
+- Row Level Security (RLS) policies protect data
+- Authenticated access to all resources
+- Data isolation between users
 
 ## Project Structure
-
 ```
-ulimi-smart-farming/
-├── client/                 # React frontend
-│   ├── public/
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Page components for routes
-│   │   ├── services/       # API service integrations
-│   │   ├── utils/          # Utility functions
-│   │   ├── hooks/          # Custom React hooks
-│   │   └── assets/         # Images, styles, etc.
-│   └── package.json
-├── server/                 # Backend services and database schema
-│   ├── iot-simulator.js    # IoT sensor data simulation
-│   └── database-schema.sql # Supabase database schema
-├── ai-models/              # AI/ML model implementations
-│   ├── pest-detection.js      # Pest/disease detection
-│   ├── recommendation-engine.js # Farming recommendations
-│   ├── price-prediction.js    # Market price forecasting
-│   └── livestock-monitoring.js # Animal health monitoring
-├── docs/                   # Documentation
-│   ├── api-documentation.md   # API endpoints reference
-│   ├── development-setup.md   # Developer setup guide
-│   ├── user-guide.md          # User manual
-│   └── ai-ml-models.md        # AI/ML models documentation
-└── README.md
+src/
+├── components/           # React components
+├── contexts/             # React context providers
+├── services/             # Supabase services and utilities
+├── utils/                # Utility functions
+├── types/                # TypeScript interfaces and types
+├── App.tsx              # Main application component
+└── main.tsx             # Application entry point
 ```
-
-## Getting Started
-
-1. Clone the repository
-2. Install dependencies: `cd client && npm install`
-3. Set up Supabase project
-4. Configure environment variables
-5. Run the development server: `npm start`
 
 ## Available Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+- `npm test` - Run tests
 
-In the client directory, you can run:
-
-### `npm start`
-Runs the app in development mode.
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-### `npm test`
-Launches the test runner in interactive watch mode.
-
-### `npm run build`
-Builds the app for production to the `build` folder.
-
-## Documentation
-
-- [API Documentation](docs/api-documentation.md)
-- [Development Setup Guide](docs/development-setup.md)
-- [User Guide](docs/user-guide.md)
-- [AI/ML Models Documentation](docs/ai-ml-models.md)
-- [Project Summary](PROJECT_SUMMARY.md)
-
-## Key Components
-
-### User Roles
-- **Farmer**: Manages farm operations, receives AI recommendations, and sells produce
-- **Buyer**: Purchases agricultural products from the marketplace
-- **Vendor**: Lists products for sale in the marketplace
-- **Admin**: Manages users and monitors system performance
-
-### AI/ML Features
-- **Pest & Disease Detection**: Upload images to detect agricultural pests and diseases
-- **Recommendation Engine**: Get personalized farming recommendations
-- **Price Prediction**: Forecast market prices for better selling decisions
-- **Livestock Monitoring**: Track animal health and predict breeding cycles
-
-### IoT Integration
-- **Sensor Data Simulation**: Realistic mock data for soil moisture, temperature, and humidity
-- **Real-time Monitoring**: Dashboard visualization of sensor data
-
-### Marketplace
-- **Product Listings**: Vendors can list agricultural products
-- **Shopping Experience**: Buyers can browse and purchase products
-- **Order Management**: Track order status and history
-
-## Security
-
-- Role-based access control
-- Row Level Security (RLS) policies
-- Authentication via Supabase Auth
-- Data encryption at rest
-
-## Deployment
-
-### Frontend
-- Ready for deployment to Vercel or Netlify
-- Production build with `npm run build`
-
-### Backend
-- Database schema for Supabase
-- Storage bucket configuration
-- RLS policies for data protection
+## User Roles
+1. **Admin**: System administrators with full access
+2. **Farmer**: Agricultural producers managing farms
+3. **Vendor**: Suppliers of agricultural products
+4. **Customer**: End consumers purchasing products
 
 ## Contributing
-
 1. Fork the repository
 2. Create a feature branch
 3. Commit your changes
@@ -128,5 +119,7 @@ Builds the app for production to the `build` folder.
 5. Create a pull request
 
 ## License
+This project is licensed under the MIT License.
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## Support
+For issues and feature requests, please create an issue in the GitHub repository.
